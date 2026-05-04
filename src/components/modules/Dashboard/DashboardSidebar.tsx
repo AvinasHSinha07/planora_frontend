@@ -20,6 +20,7 @@ import { Badge } from "@/components/ui/badge";
 
 const sidebarLinks = [
   { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
+  { href: "/dashboard/admin", label: "Admin Console", icon: ShieldAlert },
   { href: "/dashboard/events", label: "My Events", icon: Calendar },
   { href: "/dashboard/participations", label: "My Participations", icon: UserCheck },
   { href: "/dashboard/invitations", label: "Invitations", icon: Users },
@@ -28,7 +29,6 @@ const sidebarLinks = [
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
   { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
   { href: "/dashboard/analytics", label: "Analytics", icon: PieChart },
-  { href: "/dashboard/admin", label: "Admin Console", icon: ShieldAlert },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
 ];
 

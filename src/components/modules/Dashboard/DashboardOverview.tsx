@@ -20,69 +20,72 @@ export default function DashboardOverview() {
   });
 
   const getGreeting = () => {
-    if (role === "ADMIN") return "Platform Oversight";
-    if (role === "ORGANIZER") return "Event Management";
+    if (role === "ADMIN") return "System Intelligence";
+    if (role === "ORGANIZER") return "Event Logistics";
     return "Event Discovery";
   };
 
   const getDescription = () => {
-    if (role === "ADMIN") return "Monitor system health, users, and global events.";
-    if (role === "ORGANIZER") return "Track your upcoming events and participant engagement.";
-    return "Discover exciting events and manage your invitations.";
+    if (role === "ADMIN") return "Orchestrating the platform's global ecosystem.";
+    if (role === "ORGANIZER") return "Managing your upcoming events and participant engagement.";
+    return "Discovering exciting events and managing your invitations.";
   };
 
   return (
-    <div className="space-y-6">
-      <div className="bg-primary/10 rounded-2xl p-8 border border-primary/20 relative overflow-hidden">
+    <div className="space-y-10">
+      <div className="bg-primary/10 rounded-[2.5rem] p-10 border border-primary/20 relative overflow-hidden group">
         <div className="relative z-10">
-          <h2 className="text-3xl font-black tracking-tight">Welcome back, {user?.name?.split(' ')[0] || 'User'}!</h2>
-          <p className="text-muted-foreground mt-2 text-lg">{getGreeting()} — {getDescription()}</p>
+          <h2 className="text-4xl font-black tracking-tight uppercase italic">Welcome, {user?.name?.split(' ')[0] || 'Member'}!</h2>
+          <p className="text-muted-foreground mt-2 text-xl italic">{getGreeting()} — {getDescription()}</p>
         </div>
-        {/* Decorative background element */}
-        <div className="absolute top-0 right-0 p-8 opacity-10">
-          <Calendar className="h-32 w-32 rotate-12" />
+        <div className="absolute top-0 right-0 p-10 opacity-10 group-hover:scale-110 transition-transform duration-700">
+          <Calendar className="h-40 w-40 rotate-12 text-primary" />
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {role === "ORGANIZER" ? "Organized Events" : "Participations"}
+      <div className="grid gap-6 md:grid-cols-3">
+        <Card className="rounded-[2rem] border-none shadow-xl bg-card/50 backdrop-blur-md overflow-hidden relative group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-border/10">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
+              {role === "ADMIN" ? "Global Identities" : (role === "ORGANIZER" ? "Managed Events" : "Participations")}
             </CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Users className="h-4 w-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (role === "ORGANIZER" ? stats?.totalEvents : stats?.totalParticipations) || 0}
+          <CardContent className="pt-6">
+            <div className="text-4xl font-black tracking-tighter">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (role === "ADMIN" ? stats?.totalUsers : (role === "ORGANIZER" ? stats?.totalEvents : stats?.totalParticipations)) || 0}
             </div>
-            <p className="text-xs text-muted-foreground">Lifetime activity</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-2 italic">Active platform presence</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              {role === "ORGANIZER" ? "Total Attendees" : "Network Connections"}
+
+        <Card className="rounded-[2rem] border-none shadow-xl bg-card/50 backdrop-blur-xl overflow-hidden relative group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-border/10">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground">
+              {role === "ADMIN" ? "Global Content" : (role === "ORGANIZER" ? "Total Reach" : "Network Growth")}
             </CardTitle>
-            <Users className="h-4 w-4 text-muted-foreground" />
+            <Calendar className="h-4 w-4 text-primary" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (role === "ORGANIZER" ? stats?.totalAttendees : stats?.totalParticipations) || 0}
+          <CardContent className="pt-6">
+            <div className="text-4xl font-black tracking-tighter">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (role === "ADMIN" ? stats?.totalEvents : (role === "ORGANIZER" ? stats?.totalAttendees : stats?.totalParticipations)) || 0}
             </div>
-            <p className="text-xs text-muted-foreground">Engagement reach</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground mt-2 italic">Ecosystem deployment</p>
           </CardContent>
         </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Pending Invitations</CardTitle>
-            <Activity className="h-4 w-4 text-muted-foreground" />
+
+        <Card className="rounded-[2rem] border-none shadow-xl bg-primary text-primary-foreground overflow-hidden relative group">
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 border-b border-white/10">
+            <CardTitle className="text-xs font-black uppercase tracking-[0.2em] opacity-80">
+               {role === "ADMIN" ? "Global Revenue" : "Attention Required"}
+            </CardTitle>
+            <Activity className="h-4 w-4 opacity-80" />
           </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : stats?.pendingInvitations || 0}
+          <CardContent className="pt-6">
+            <div className="text-4xl font-black tracking-tighter">
+              {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : (role === "ADMIN" ? `$${(stats?.totalRevenue || 0).toLocaleString()}` : stats?.pendingInvitations || 0)}
             </div>
-            <p className="text-xs text-muted-foreground">Requires attention</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest opacity-60 mt-2 italic">Real-time status</p>
           </CardContent>
         </Card>
       </div>

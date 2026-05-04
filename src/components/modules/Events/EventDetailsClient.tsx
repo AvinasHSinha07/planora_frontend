@@ -16,6 +16,14 @@ import { Separator } from "@/components/ui/separator";
 import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
+import { 
+  Carousel, 
+  CarouselContent, 
+  CarouselItem, 
+  CarouselNext, 
+  CarouselPrevious 
+} from "@/components/ui/carousel";
+import { MessageSquare } from "lucide-react";
 
 export default function EventDetailsClient({ initialData }: { initialData: any }) {
   const { id } = useParams();
@@ -237,59 +245,67 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
             </Card>
 
             {/* Reviews Section */}
-            <div className="space-y-8 pt-8 border-t">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-1 bg-primary rounded-full" />
-                  <h2 className="text-2xl font-bold">Attendee Reviews</h2>
+            <div className="space-y-10 pt-12 border-t">
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 text-primary">
+                    <Star className="w-5 h-5 fill-current" />
+                    <span className="text-sm font-black uppercase tracking-widest">Attendee Insights</span>
+                  </div>
+                  <h2 className="text-3xl font-black tracking-tight uppercase italic">What People <span className="text-primary">Think</span></h2>
                 </div>
-                <div className="flex items-center gap-1 text-lg font-bold">
-                  <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
-                  {averageRating}
-                  <span className="text-muted-foreground font-normal text-sm ml-1">
+                <div className="flex items-center gap-3 bg-muted/30 px-6 py-3 rounded-2xl border">
+                  <div className="flex gap-0.5">
+                    {[...Array(5)].map((_, i) => (
+                      <Star 
+                        key={i} 
+                        className={`w-4 h-4 ${i < Math.round(Number(averageRating)) ? "fill-amber-500 text-amber-500" : "text-muted/30"}`} 
+                      />
+                    ))}
+                  </div>
+                  <span className="text-xl font-black italic">{averageRating}</span>
+                  <span className="text-muted-foreground font-bold text-xs uppercase tracking-wider">
                     ({event.reviews?.length || 0} reviews)
                   </span>
                 </div>
               </div>
 
-              {/* Review Submission Form */}
+              {/* Review Submission Form - Conditional */}
               {isParticipant && !hasAlreadyReviewed && (
-                <Card className="rounded-3xl border-primary/20 bg-primary/5 shadow-inner">
-                  <CardContent className="p-8 space-y-6">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
-                        <Star className="w-5 h-5 fill-current" />
-                      </div>
-                      <div>
-                        <h3 className="text-xl font-bold">Leave a Review</h3>
-                        <p className="text-sm text-muted-foreground">Share your experience with other attendees.</p>
-                      </div>
+                <Card className="rounded-[2.5rem] border-primary/20 bg-primary/5 shadow-inner overflow-hidden relative group">
+                   <div className="absolute top-0 right-0 p-8 opacity-5">
+                      <Star className="w-32 h-32" />
+                   </div>
+                  <CardContent className="p-10 space-y-8 relative z-10">
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-black uppercase italic">Share Your Experience</h3>
+                      <p className="text-muted-foreground italic">Your feedback helps the community discover the best events.</p>
                     </div>
                     
-                    <form onSubmit={handleSubmitReview} className="space-y-6">
-                      <div className="space-y-3">
-                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Rating</p>
-                        <div className="flex gap-2">
+                    <form onSubmit={handleSubmitReview} className="space-y-8">
+                      <div className="flex flex-col gap-4">
+                        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Select Performance Rating</p>
+                        <div className="flex gap-3">
                           {[1, 2, 3, 4, 5].map((star) => (
                             <button
                               key={star}
                               type="button"
                               onClick={() => setReviewRating(star)}
-                              className="focus:outline-none transition-transform active:scale-90"
+                              className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
                             >
                               <Star 
-                                className={`w-8 h-8 ${star <= reviewRating ? "fill-amber-500 text-amber-500" : "text-muted/30"}`} 
+                                className={`w-10 h-10 ${star <= reviewRating ? "fill-amber-500 text-amber-500 drop-shadow-[0_0_8px_rgba(245,158,11,0.3)]" : "text-muted/20"}`} 
                               />
                             </button>
                           ))}
                         </div>
                       </div>
 
-                      <div className="space-y-3">
-                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Your Thoughts</p>
-                        <Textarea 
-                          placeholder="What did you like about this event? How was the organization?"
-                          className="min-h-[120px] rounded-2xl bg-background border-primary/10 focus:border-primary/30 transition-all text-lg"
+                      <div className="space-y-4">
+                         <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">Review Narrative</p>
+                         <Textarea 
+                          placeholder="How was the atmosphere? What could be improved?"
+                          className="min-h-[140px] rounded-[1.5rem] bg-background border-primary/10 focus:border-primary/40 focus:ring-primary/20 transition-all text-lg italic p-6"
                           value={reviewComment}
                           onChange={(e) => setReviewComment(e.target.value)}
                         />
@@ -297,10 +313,10 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
 
                       <Button 
                         type="submit" 
-                        className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-primary/20"
+                        className="w-full md:w-fit px-12 h-16 rounded-2xl text-lg font-black uppercase tracking-tight shadow-xl shadow-primary/20 hover:scale-105 transition-all"
                         disabled={reviewMutation.isPending || !reviewComment}
                       >
-                        {reviewMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Post Review"}
+                        {reviewMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Publish Review"}
                       </Button>
                     </form>
                   </CardContent>
@@ -308,42 +324,60 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
               )}
 
               {event.reviews?.length > 0 ? (
-                <div className="grid gap-6">
-                  {event.reviews.map((review: any) => (
-                    <Card key={review.id} className="rounded-2xl border-none bg-muted/30">
-                      <CardContent className="p-6 space-y-4">
-                        <div className="flex justify-between items-start">
-                          <div className="flex items-center gap-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src={review.user?.image || review.user?.avatar} />
-                              <AvatarFallback>{review.user?.name?.charAt(0)}</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <p className="font-bold text-sm">{review.user?.name}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {format(new Date(review.createdAt), "MMM d, yyyy")}
-                              </p>
-                            </div>
-                          </div>
-                          <div className="flex gap-0.5">
-                            {[...Array(5)].map((_, i) => (
-                              <Star 
-                                key={i} 
-                                className={`w-3.5 h-3.5 ${i < review.rating ? "fill-amber-500 text-amber-500" : "text-muted/40"}`} 
-                              />
-                            ))}
-                          </div>
-                        </div>
-                        <p className="text-muted-foreground leading-relaxed italic">
-                          "{review.comment}"
-                        </p>
-                      </CardContent>
-                    </Card>
-                  ))}
+                <div className="relative px-12">
+                   <Carousel className="w-full" opts={{ align: "start" }}>
+                    <CarouselContent className="-ml-4">
+                      {event.reviews.map((review: any) => (
+                        <CarouselItem key={review.id} className="pl-4 md:basis-1/2 lg:basis-1/2">
+                          <Card className="rounded-[2.5rem] border-none bg-muted/20 hover:bg-muted/30 transition-all duration-500 h-full group">
+                            <CardContent className="p-8 flex flex-col justify-between h-full space-y-6">
+                              <div className="space-y-6">
+                                <div className="flex justify-between items-start">
+                                  <div className="flex items-center gap-3">
+                                    <Avatar className="w-12 h-12 border-2 border-background shadow-lg">
+                                      <AvatarImage src={review.user?.image || review.user?.avatar} />
+                                      <AvatarFallback className="font-black bg-primary/10 text-primary">{review.user?.name?.charAt(0)}</AvatarFallback>
+                                    </Avatar>
+                                    <div className="space-y-0.5">
+                                      <p className="font-black text-sm uppercase tracking-tight italic">{review.user?.name}</p>
+                                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                                        {format(new Date(review.createdAt), "MMM d, yyyy")}
+                                      </p>
+                                    </div>
+                                  </div>
+                                  <div className="flex gap-0.5 bg-background/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10">
+                                    {[...Array(5)].map((_, i) => (
+                                      <Star 
+                                        key={i} 
+                                        className={`w-3 h-3 ${i < review.rating ? "fill-amber-500 text-amber-500" : "text-muted/20"}`} 
+                                      />
+                                    ))}
+                                  </div>
+                                </div>
+                                <p className="text-muted-foreground leading-relaxed italic text-lg line-clamp-4">
+                                  "{review.comment}"
+                                </p>
+                              </div>
+                              <div className="pt-4 border-t border-muted-foreground/10">
+                                 <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-primary opacity-50">
+                                    <ShieldCheck className="w-3 h-3" /> Verified Attendee
+                                 </div>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="h-12 w-12 border-none bg-background/50 backdrop-blur-xl shadow-xl hover:bg-primary hover:text-white transition-all -left-6" />
+                    <CarouselNext className="h-12 w-12 border-none bg-background/50 backdrop-blur-xl shadow-xl hover:bg-primary hover:text-white transition-all -right-6" />
+                  </Carousel>
                 </div>
               ) : (
-                <div className="text-center py-12 bg-muted/20 rounded-3xl border border-dashed">
-                  <p className="text-muted-foreground italic">No reviews yet. Be the first to share your experience!</p>
+                <div className="text-center py-20 bg-muted/10 rounded-[3rem] border-2 border-dashed border-border/50 group hover:border-primary/30 transition-colors">
+                  <div className="inline-flex p-6 rounded-full bg-muted/20 mb-4 group-hover:scale-110 transition-transform">
+                     <MessageSquare className="w-10 h-10 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-muted-foreground text-xl italic max-w-sm mx-auto">Be the first to architect a perspective on this event experience.</p>
                 </div>
               )}
             </div>

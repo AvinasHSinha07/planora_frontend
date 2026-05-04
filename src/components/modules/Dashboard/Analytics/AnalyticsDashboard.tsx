@@ -1,12 +1,22 @@
 "use client";
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { BarChart3, TrendingUp, Users, DollarSign, Loader2, Calendar, Target, Zap, Badge } from "lucide-react";
+import { 
+  BarChart3, 
+  TrendingUp, 
+  Users, 
+  DollarSign, 
+  Loader2, 
+  Calendar, 
+  Target, 
+  Zap, 
+  Ticket as TicketIcon,
+  Activity,
+  ArrowUpRight
+} from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { 
-  BarChart, 
-  Bar, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
@@ -14,10 +24,12 @@ import {
   ResponsiveContainer, 
   AreaChart, 
   Area,
+  BarChart,
+  Bar,
   Cell
 } from "recharts";
 import { motion } from "framer-motion";
-import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
 export default function AnalyticsDashboard() {
   const { data: stats, isLoading } = useQuery({
@@ -28,103 +40,101 @@ export default function AnalyticsDashboard() {
     },
   });
 
-  const avgAttendance = stats?.totalEvents > 0 
-    ? Math.round((stats.totalAttendees / (stats.totalEvents * 100)) * 100) // Mock logic for %
-    : 0;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center py-32">
+        <Loader2 className="h-12 w-12 animate-spin text-primary opacity-50" />
+      </div>
+    );
+  }
+
+  const growthData = stats?.growthData || [];
+  const isGlobalStats = !!growthData[0]?.users; // Heuristic for Admin vs Organizer
 
   const displayStats = [
     { 
       title: "Total Revenue", 
       value: `$${stats?.totalRevenue?.toLocaleString() || 0}`, 
       icon: DollarSign, 
-      trend: "+12.5%",
       color: "text-emerald-500",
-      bg: "bg-emerald-500/10"
+      bg: "bg-emerald-500/10",
+      description: "Gross platform earnings"
     },
     { 
-      title: "Ticket Sales", 
-      value: stats?.ticketSales || 0, 
-      icon: TicketIcon, 
-      trend: "+8.2%",
+      title: isGlobalStats ? "Total Users" : "Ticket Sales", 
+      value: isGlobalStats ? stats?.totalUsers : stats?.ticketSales || 0, 
+      icon: isGlobalStats ? Users : TicketIcon, 
       color: "text-blue-500",
-      bg: "bg-blue-500/10"
+      bg: "bg-blue-500/10",
+      description: isGlobalStats ? "Verified ecosystem identities" : "Successful event bookings"
     },
     { 
       title: "Active Events", 
       value: stats?.totalEvents || 0, 
       icon: Calendar, 
-      trend: "+5.1%",
       color: "text-purple-500",
-      bg: "bg-purple-500/10"
+      bg: "bg-purple-500/10",
+      description: "Live deployments on platform"
     },
     { 
-      title: "Avg. Engagement", 
-      value: `${avgAttendance || 78}%`, 
-      icon: Zap, 
-      trend: "+2.4%",
+      title: isGlobalStats ? "Participants" : "Engagement", 
+      value: isGlobalStats ? stats?.totalParticipants : `${Math.round((stats?.totalAttendees / (stats?.totalEvents * 10 || 1)) * 10)}%`, 
+      icon: isGlobalStats ? Target : Zap, 
       color: "text-amber-500",
-      bg: "bg-amber-500/10"
+      bg: "bg-amber-500/10",
+      description: isGlobalStats ? "Global approved attendees" : "Average attendee interaction"
     },
   ];
 
-  // Mock chart data based on real stats
-  const chartData = [
-    { name: "Jan", sales: (stats?.totalRevenue || 0) * 0.1 },
-    { name: "Feb", sales: (stats?.totalRevenue || 0) * 0.15 },
-    { name: "Mar", sales: (stats?.totalRevenue || 0) * 0.25 },
-    { name: "Apr", sales: (stats?.totalRevenue || 0) * 0.2 },
-    { name: "May", sales: (stats?.totalRevenue || 0) * 0.3 },
-  ];
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center py-24">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-      </div>
-    );
-  }
-
   return (
-    <div className="space-y-8 pb-12">
+    <div className="space-y-12 pb-24 max-w-7xl mx-auto">
+      {/* Header Section */}
       <motion.div 
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-4"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        className="flex flex-col md:flex-row md:items-end justify-between gap-6"
       >
-        <div>
-          <h2 className="text-4xl font-black tracking-tight">Performance <span className="text-primary">Analytics</span></h2>
-          <p className="text-muted-foreground mt-1 text-lg">Real-time insights into your event ecosystem.</p>
+        <div className="space-y-2">
+           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
+              <Activity className="w-3 h-3" /> Real-time Ecosystem Pulse
+           </div>
+           <h2 className="text-6xl font-black tracking-tighter uppercase italic leading-none">
+              Platform <span className="text-primary underline decoration-primary/20 underline-offset-[12px]">Intelligence</span>
+           </h2>
+           <p className="text-muted-foreground text-xl italic max-w-2xl">
+              Analyzing high-frequency data streams across your administrative perimeter.
+           </p>
         </div>
-        <div className="flex items-center gap-2 bg-muted/50 px-4 py-2 rounded-2xl border border-border/50">
-           <Calendar className="w-4 h-4 text-muted-foreground" />
-           <span className="text-sm font-bold">Last 30 Days</span>
+        <div className="flex items-center gap-4 bg-muted/30 px-6 py-3 rounded-2xl border border-border/40 backdrop-blur-md">
+           <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50" />
+           <span className="text-sm font-black uppercase tracking-widest italic opacity-70">Live Data Sync: Active</span>
         </div>
       </motion.div>
 
-      {/* Quick Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      {/* Intelligence Grid */}
+      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
         {displayStats.map((stat, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+            whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
+            viewport={{ once: true }}
           >
-            <Card className="border-none shadow-lg shadow-black/5 rounded-[2rem] overflow-hidden bg-card/50 backdrop-blur-sm group hover:bg-card transition-all duration-500">
-              <CardContent className="p-8">
-                <div className="flex justify-between items-start mb-4">
-                   <div className={`p-3 rounded-2xl ${stat.bg} ${stat.color} transition-colors duration-500`}>
+            <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-xl group hover:scale-[1.02] transition-all duration-500">
+              <CardContent className="p-10 relative">
+                <stat.icon className={`absolute -right-4 -bottom-4 w-32 h-32 ${stat.color} opacity-5 group-hover:scale-125 transition-transform duration-1000`} />
+                <div className="space-y-4 relative z-10">
+                   <div className={`inline-flex p-4 rounded-[1.5rem] ${stat.bg} ${stat.color} shadow-lg shadow-black/5`}>
                       <stat.icon className="h-6 w-6" />
                    </div>
-                   <Badge  className="bg-emerald-500/10 text-emerald-600 border-none">
-                      {stat.trend}
-                   </Badge>
-                </div>
-                <div className="space-y-1">
-                  <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider">{stat.title}</p>
-                  <div className="text-3xl font-black tracking-tighter">
-                    {stat.value}
-                  </div>
+                   <div className="space-y-1">
+                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.title}</p>
+                      <div className="text-5xl font-black tracking-tighter italic">
+                        {stat.value}
+                      </div>
+                      <p className="text-[10px] font-bold text-muted-foreground/50 italic">{stat.description}</p>
+                   </div>
                 </div>
               </CardContent>
             </Card>
@@ -132,96 +142,141 @@ export default function AnalyticsDashboard() {
         ))}
       </div>
 
-      <div className="grid gap-8 md:grid-cols-3">
-        {/* Main Growth Chart */}
-        <Card className="md:col-span-2 border-none shadow-xl shadow-black/5 rounded-[2.5rem] overflow-hidden bg-card/50 backdrop-blur-sm">
-          <CardHeader className="p-8 pb-0">
-            <CardTitle className="text-xl font-bold flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-primary" />
-              Revenue Growth
-            </CardTitle>
-            <CardDescription>Monthly performance breakdown</CardDescription>
+      <div className="grid gap-10 lg:grid-cols-3">
+        {/* Growth Architecture Chart */}
+        <Card className="lg:col-span-2 border-none shadow-3xl rounded-[3.5rem] overflow-hidden bg-card/40 backdrop-blur-xl">
+          <CardHeader className="p-10 pb-0 flex flex-row items-center justify-between">
+            <div className="space-y-1">
+              <CardTitle className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-3">
+                <TrendingUp className="w-6 h-6 text-primary" />
+                Growth <span className="text-muted-foreground">Trajectory</span>
+              </CardTitle>
+              <CardDescription className="italic">7-Day velocity breakdown per ecosystem node</CardDescription>
+            </div>
+            <Badge variant="outline" className="rounded-full px-6 py-2 font-black italic uppercase tracking-widest text-[10px] border-primary/20 text-primary">
+               Real-time Metric
+            </Badge>
           </CardHeader>
-          <CardContent className="p-8 h-[350px]">
+          <CardContent className="p-10 h-[450px]">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartData}>
-                <defs>
-                  <linearGradient id="colorSales" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{fontSize: 12, fontWeight: 600}} />
-                <YAxis hide />
-                <Tooltip 
-                  contentStyle={{borderRadius: '16px', border: 'none', boxShadow: '0 10px 30px rgba(0,0,0,0.1)'}} 
-                />
-                <Area 
-                  type="monotone" 
-                  dataKey="sales" 
-                  stroke="var(--primary)" 
-                  strokeWidth={4}
-                  fillOpacity={1} 
-                  fill="url(#colorSales)" 
-                />
-              </AreaChart>
+              {isGlobalStats ? (
+                <AreaChart data={growthData}>
+                  <defs>
+                    <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="var(--primary)" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="var(--primary)" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorEvents" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.4}/>
+                      <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                  <XAxis 
+                    dataKey="name" 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{fontSize: 12, fontWeight: 900, fill: '#888'}} 
+                  />
+                  <YAxis hide />
+                  <Tooltip 
+                    contentStyle={{borderRadius: '2rem', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', padding: '20px'}} 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="users" 
+                    name="Identity Growth"
+                    stroke="var(--primary)" 
+                    strokeWidth={5}
+                    fillOpacity={1} 
+                    fill="url(#colorUsers)" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="events" 
+                    name="Deployment Growth"
+                    stroke="#8b5cf6" 
+                    strokeWidth={5}
+                    fillOpacity={1} 
+                    fill="url(#colorEvents)" 
+                  />
+                </AreaChart>
+              ) : (
+                <BarChart data={growthData}>
+                   <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(0,0,0,0.05)" />
+                   <XAxis 
+                     dataKey="name" 
+                     axisLine={false} 
+                     tickLine={false} 
+                     tick={{fontSize: 12, fontWeight: 900, fill: '#888'}} 
+                   />
+                   <YAxis hide />
+                   <Tooltip 
+                     cursor={{fill: 'rgba(0,0,0,0.02)'}}
+                     contentStyle={{borderRadius: '2rem', border: 'none', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)', padding: '20px'}} 
+                   />
+                   <Bar 
+                     dataKey="count" 
+                     name="Approved Attendees"
+                     fill="var(--primary)" 
+                     radius={[15, 15, 0, 0]} 
+                     barSize={50}
+                   >
+                     {growthData.map((entry: any, index: number) => (
+                       <Cell key={`cell-${index}`} className="hover:opacity-80 transition-opacity" />
+                     ))}
+                   </Bar>
+                </BarChart>
+              )}
             </ResponsiveContainer>
           </CardContent>
         </Card>
 
-        {/* Secondary Info Card */}
-        <Card className="border-none shadow-xl shadow-black/5 rounded-[2.5rem] overflow-hidden bg-primary text-primary-foreground relative">
-           <div className="absolute top-0 right-0 p-8 opacity-10">
-              <Target className="w-32 h-32" />
-           </div>
-           <CardHeader className="p-8">
-              <CardTitle className="text-2xl font-black leading-tight">Achievement <br />Unlocked</CardTitle>
-              <CardDescription className="text-primary-foreground/70">You've reached the Top 5% of organizers this month!</CardDescription>
-           </CardHeader>
-           <CardContent className="p-8 space-y-6">
-              <div className="space-y-2">
-                 <div className="flex justify-between text-sm font-bold">
-                    <span>Platform Rank</span>
-                    <span>94/100</span>
+        {/* Milestone Achievement Card */}
+        <div className="flex flex-col gap-8">
+           <Card className="border-none shadow-3xl rounded-[3.5rem] overflow-hidden bg-primary text-primary-foreground relative p-10 group">
+              <ArrowUpRight className="absolute -right-6 -top-6 w-48 h-48 opacity-10 group-hover:scale-125 transition-transform duration-700" />
+              <div className="relative z-10 space-y-8">
+                 <div className="space-y-2">
+                    <h3 className="text-4xl font-black uppercase italic leading-none">Global <br />Achievement</h3>
+                    <p className="text-primary-foreground/70 italic font-medium">Platform performance milestone reached.</p>
                  </div>
-                 <div className="h-3 bg-white/20 rounded-full overflow-hidden">
-                    <motion.div 
-                      initial={{ width: 0 }}
-                      animate={{ width: "94%" }}
-                      transition={{ duration: 1.5, ease: "easeOut" }}
-                      className="h-full bg-white"
-                    />
+                 <div className="space-y-4">
+                    <div className="flex justify-between text-xs font-black uppercase tracking-widest">
+                       <span>Efficiency Target</span>
+                       <span>94%</span>
+                    </div>
+                    <div className="h-4 bg-white/20 rounded-full overflow-hidden border border-white/10 p-1">
+                       <motion.div 
+                         initial={{ width: 0 }}
+                         animate={{ width: "94%" }}
+                         transition={{ duration: 2, ease: "circOut" }}
+                         className="h-full bg-white rounded-full shadow-[0_0_20px_rgba(255,255,255,0.5)]"
+                       />
+                    </div>
+                 </div>
+                 <div className="pt-4">
+                    <div className="flex items-center gap-4 px-6 py-4 rounded-[1.5rem] bg-white/10 border border-white/20 backdrop-blur-md">
+                       <Zap className="w-5 h-5 text-amber-400 fill-amber-400" />
+                       <span className="font-black italic text-sm uppercase tracking-tighter">Velocity Spike: +12.4%</span>
+                    </div>
                  </div>
               </div>
-              <Button variant="secondary" className="w-full rounded-2xl h-12 font-bold group">
-                 View Milestone Report
-              </Button>
-           </CardContent>
-        </Card>
+           </Card>
+
+           <Card className="border-none shadow-3xl rounded-[3.5rem] overflow-hidden bg-card/40 backdrop-blur-xl p-10 relative group">
+              <div className="flex items-center gap-6">
+                 <div className="p-5 rounded-[1.5rem] bg-amber-500/10 text-amber-500 shadow-xl shadow-amber-500/5">
+                    <Target className="w-8 h-8" />
+                 </div>
+                 <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Ecosystem Health</p>
+                    <p className="text-2xl font-black italic tracking-tighter">Optimal Performance</p>
+                 </div>
+              </div>
+           </Card>
+        </div>
       </div>
     </div>
   );
-}
-
-function TicketIcon(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z" />
-      <path d="M13 5v2" />
-      <path d="M13 17v2" />
-      <path d="M13 11v2" />
-    </svg>
-  )
 }

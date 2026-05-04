@@ -23,15 +23,20 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   console.log(`[DASHBOARD] User ${session.user.email} (${userRole}) authorized.`);
 
   return (
-    <div className="flex min-h-[calc(100vh-64px)] bg-muted/10">
-      <div className="container mx-auto flex overflow-hidden pt-4 pb-8 px-4 gap-6">
-        <aside className="hidden w-64 md:block flex-shrink-0">
+    <div className="flex min-h-screen bg-background relative">
+      {/* Sidebar: Fixed height and sticky to the viewport */}
+      <aside className="w-64 border-r bg-card hidden md:block flex-shrink-0 sticky top-0 h-screen overflow-y-auto">
+        <div className="p-4">
           <DashboardSidebar />
-        </aside>
-        <main className="flex-1 w-full overflow-y-auto">
+        </div>
+      </aside>
+
+      {/* Main Content: Natural flow with browser scrollbar */}
+      <main className="flex-1 min-w-0 p-4 md:p-10">
+        <div className="max-w-7xl mx-auto w-full">
           {children}
-        </main>
-      </div>
+        </div>
+      </main>
     </div>
   );
 }

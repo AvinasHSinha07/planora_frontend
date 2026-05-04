@@ -5,7 +5,7 @@ import { Suspense } from "react";
 async function getEvent(id: string) {
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/events/${id}`, {
-      next: { revalidate: 60 }, // Cache for 60 seconds
+      cache: "no-store",
     });
     
     if (!res.ok) return null;

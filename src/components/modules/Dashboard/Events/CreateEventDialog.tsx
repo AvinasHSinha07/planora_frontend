@@ -10,6 +10,7 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
+import ImageUpload from "@/components/shared/ImageUpload";
 
 import {
   Dialog,
@@ -50,6 +51,7 @@ const eventFormSchema = z.object({
   fee: z.coerce.number().min(0, "Fee cannot be negative"),
   eventType: z.enum(["PUBLIC_FREE", "PUBLIC_PAID", "PRIVATE_FREE", "PRIVATE_PAID"]),
   categoryId: z.string().min(1, "Category is required"),
+  bannerImage: z.string().url("Banner image is required").min(1, "Banner image is required"),
 });
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
@@ -77,6 +79,7 @@ export default function CreateEventDialog() {
       fee: 0,
       eventType: "PUBLIC_FREE",
       categoryId: "",
+      bannerImage: "",
     },
   });
   useEffect(() => {
@@ -122,7 +125,7 @@ export default function CreateEventDialog() {
           <Plus className="mr-2 h-4 w-4" /> Create Event
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto" data-lenis-prevent>
         <DialogHeader>
           <DialogTitle>Create New Event</DialogTitle>
           <DialogDescription>
@@ -131,6 +134,23 @@ export default function CreateEventDialog() {
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit((d) => onSubmit(d))} className="space-y-6">
+            <FormField
+              control={form.control}
+              name="bannerImage"
+              render={({ field }: { field: any }) => (
+                <FormItem>
+                  <FormLabel>Event Banner</FormLabel>
+                  <FormControl>
+                    <ImageUpload 
+                      value={field.value} 
+                      onChange={field.onChange} 
+                      disabled={createEventMutation.isPending}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
             <FormField
               control={form.control}
               name="title"

@@ -2,7 +2,7 @@ import EventsPageClient from "@/components/modules/Events/EventsPageClient";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
-export const revalidate = 3600; // ISR: 1 hour
+export const revalidate = 60; // ISR: 1 minute
 
 export default function EventsPage() {
   return (

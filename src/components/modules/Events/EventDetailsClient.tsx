@@ -36,6 +36,7 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
 
   const isParticipant = event?.participants?.some((p: any) => p.userId === session?.user?.id && p.status === "APPROVED");
   const hasAlreadyReviewed = event?.reviews?.some((r: any) => r.userId === session?.user?.id);
+  const isExpired = new Date(event?.date) < new Date();
 
   const reviewMutation = useMutation({
     mutationFn: async (newReview: { eventId: string; rating: number; comment: string }) => {
@@ -89,12 +90,16 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
         }, 1500);
       }
     },
-    onError: () => {
-      toast.error("Failed to join event");
+    onError: (error: any) => {
+      toast.error(error.response?.data?.message || "Failed to join event");
     },
   });
 
   const handleJoin = async () => {
+    if (isExpired) {
+      toast.error("This event has already ended.");
+      return;
+    }
     joinMutation.mutate();
   };
 
@@ -433,10 +438,12 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
                       size="lg" 
                       className="w-full text-lg h-16 rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold" 
                       onClick={handleJoin}
-                      disabled={joinMutation.isPending}
+                      disabled={joinMutation.isPending || isExpired}
                     >
                       {joinMutation.isPending ? (
                         <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : isExpired ? (
+                        "Event Expired"
                       ) : event.fee > 0 ? (
                         "Secure Your Spot"
                       ) : (

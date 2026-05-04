@@ -35,16 +35,18 @@ export default function EventsPageClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
   const [type, setType] = useState("all");
+  const [eventStatus, setEventStatus] = useState("upcoming");
   const [page, setPage] = useState(1);
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   const { data, isLoading, error } = useQuery({
-    queryKey: ["events", debouncedSearchTerm, category, type, page],
+    queryKey: ["events", debouncedSearchTerm, category, type, eventStatus, page],
     queryFn: async (): Promise<{ events: EventData[], meta: any }> => {
       const params = new URLSearchParams();
       if (debouncedSearchTerm) params.append("searchTerm", debouncedSearchTerm);
       if (category !== "all") params.append("category", category);
       if (type !== "all") params.append("type", type);
+      if (eventStatus !== "all") params.append("status", eventStatus);
       params.append("page", page.toString());
       params.append("limit", "9"); // 9 items per page (3x3 grid)
       
@@ -75,8 +77,8 @@ export default function EventsPageClient() {
       <div className="mb-12 space-y-6">
         <h1 className="text-4xl font-extrabold tracking-tight">Discover Events</h1>
         
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2 relative">
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <div className="md:col-span-1 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input 
                 placeholder="Search by title, organizer, or description..." 
@@ -117,6 +119,20 @@ export default function EventsPageClient() {
               <SelectItem value="PUBLIC_PAID">Public Paid</SelectItem>
               <SelectItem value="PRIVATE_FREE">Private Free</SelectItem>
               <SelectItem value="PRIVATE_PAID">Private Paid</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={eventStatus} onValueChange={(val) => handleFilterChange(setEventStatus, val)}>
+            <SelectTrigger className="h-12 rounded-xl">
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="h-4 w-4" />
+                <SelectValue placeholder="Status" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Events</SelectItem>
+              <SelectItem value="upcoming">Upcoming</SelectItem>
+              <SelectItem value="past">Past Events</SelectItem>
             </SelectContent>
           </Select>
         </div>

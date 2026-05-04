@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,15 +10,46 @@ import { Calendar, MapPin, Loader2, Ticket, CheckCircle2, Clock, XCircle, Ban } 
 import { format } from "date-fns";
 import Link from "next/link";
 import Image from "next/image";
+import { useSearchParams, useRouter } from "next/navigation";
+import { useEffect, useRef } from "react";
+import { toast } from "sonner";
 
 export default function ParticipationsClient() {
-  const { data: participations = [], isLoading } = useQuery({
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const queryClient = useQueryClient();
+  const verificationDone = useRef(false);
+
+  const paymentStatus = searchParams.get("payment");
+  const sessionId = searchParams.get("session_id");
+
+  const { data: participations = [], isLoading, refetch } = useQuery({
     queryKey: ["my-participations"],
     queryFn: async () => {
       const { data } = await axiosInstance.get("/participations/my-participations");
       return data.data;
     },
   });
+
+  useEffect(() => {
+    if (paymentStatus === "success" && sessionId && !verificationDone.current) {
+      verificationDone.current = true;
+      const verifyPayment = async () => {
+        try {
+          const { data } = await axiosInstance.get(`/payments/verify-session?sessionId=${sessionId}`);
+          if (data.success) {
+            toast.success("Payment verified successfully!");
+            queryClient.invalidateQueries({ queryKey: ["my-participations"] });
+            // Clean up URL
+            router.replace("/dashboard/participations");
+          }
+        } catch (error) {
+          console.error("Payment verification failed", error);
+        }
+      };
+      verifyPayment();
+    }
+  }, [paymentStatus, sessionId, queryClient, router]);
 
   const getStatusIcon = (status: string) => {
     switch (status) {
@@ -60,10 +91,10 @@ export default function ParticipationsClient() {
           <CardHeader className="p-0">
              <div className="relative h-40 w-full overflow-hidden">
                 <Image 
-                  src={p.event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000&auto=format&fit=crop"} 
-                  className="object-cover group-hover:scale-110 transition-transform duration-700"
-                  alt={p.event.title}
-                  fill
+                   src={p.event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000&auto=format&fit=crop"} 
+                   className="object-cover group-hover:scale-110 transition-transform duration-700"
+                   alt={p.event.title}
+                   fill
                 />
                 <div className="absolute top-4 left-4">
                    <Badge variant="secondary" className="bg-background/80 backdrop-blur-md text-foreground border-none">

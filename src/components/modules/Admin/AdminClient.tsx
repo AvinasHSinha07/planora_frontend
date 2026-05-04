@@ -9,8 +9,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar as CalendarIcon, AlertTriangle, ShieldCheck, Trash2, Ban } from "lucide-react";
+import { Users, Calendar as CalendarIcon, AlertTriangle, ShieldCheck, Trash2, Ban, Star } from "lucide-react";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export default function AdminClient() {
   const [activeTab, setActiveTab] = useState("users");

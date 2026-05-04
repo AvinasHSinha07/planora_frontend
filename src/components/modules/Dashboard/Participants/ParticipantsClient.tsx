@@ -18,19 +18,22 @@ import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { format } from "date-fns";
 import ManageParticipantsDialog from "../Events/ManageParticipantsDialog";
+import { authClient } from "@/lib/auth-client";
 
 export default function ParticipantsClient() {
   const [search, setSearch] = useState("");
 
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ["my-events-participants"],
+  const { data: session } = authClient.useSession();
+  const { data, isLoading } = useQuery({
+    queryKey: ["my-events-participants", session?.user?.id],
     queryFn: async () => {
-      // We fetch events and then we'll see their participant counts or details
-      // Better yet, let's just fetch all events organized by me
-      const { data } = await axiosInstance.get("/events"); // This usually returns events for the current user if filtered
+      const { data } = await axiosInstance.get(`/events?limit=100&organizerId=${session?.user?.id}`);
       return data.data;
     },
+    enabled: !!session?.user?.id,
   });
+
+  const events = data?.events || [];
 
   const filteredEvents = events.filter((event: any) => 
     event.title.toLowerCase().includes(search.toLowerCase())

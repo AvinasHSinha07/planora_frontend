@@ -9,6 +9,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, MapPin, Loader2, Ticket, CheckCircle2, Clock, XCircle, Ban } from "lucide-react";
 import { format } from "date-fns";
 import Link from "next/link";
+import Image from "next/image";
 
 export default function ParticipationsClient() {
   const { data: participations = [], isLoading } = useQuery({
@@ -58,10 +59,11 @@ export default function ParticipationsClient() {
         <Card key={p.id} className="overflow-hidden rounded-[2rem] border-border/50 hover:shadow-2xl transition-all duration-500 flex flex-col group">
           <CardHeader className="p-0">
              <div className="relative h-40 w-full overflow-hidden">
-                <img 
+                <Image 
                   src={p.event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000&auto=format&fit=crop"} 
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
                   alt={p.event.title}
+                  fill
                 />
                 <div className="absolute top-4 left-4">
                    <Badge variant="secondary" className="bg-background/80 backdrop-blur-md text-foreground border-none">

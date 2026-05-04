@@ -1,47 +1,87 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent } from "@/components/ui/card";
-import { Music, Code, Briefcase, Camera, Heart, Utensils } from "lucide-react";
+import { Music, Code, Briefcase, Camera, Heart, Utensils, Sparkles, Globe, Ticket } from "lucide-react";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
-const categories = [
-  { id: 1, name: "Technology", icon: Code, count: "120+ Events" },
-  { id: 2, name: "Music & Arts", icon: Music, count: "85+ Events" },
-  { id: 3, name: "Business", icon: Briefcase, count: "45+ Events" },
-  { id: 4, name: "Photography", icon: Camera, count: "30+ Events" },
-  { id: 5, name: "Health & Wellness", icon: Heart, count: "60+ Events" },
-  { id: 6, name: "Food & Drink", icon: Utensils, count: "90+ Events" },
-];
+const iconMap: Record<string, any> = {
+  "Technology": Code,
+  "Music": Music,
+  "Business": Briefcase,
+  "Photography": Camera,
+  "Health": Heart,
+  "Food": Utensils,
+  "Festival": Sparkles,
+  "Show": Ticket,
+  "Day Out": Globe
+};
 
 export default function CategoriesSection() {
+  const { data: categories = [], isLoading } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/categories");
+      return data.data;
+    },
+  });
+
   return (
-    <section className="py-24 bg-muted/10">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">Explore by Category</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-            Find the perfect event tailored to your unique interests and passions.
-          </p>
+    <section className="py-24 bg-background relative overflow-hidden">
+      <div className="container mx-auto px-4 relative z-10">
+        <div className="text-center mb-16 space-y-4">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-4xl md:text-5xl font-black tracking-tight">Explore by Category</h2>
+            <p className="text-muted-foreground text-lg max-w-2xl mx-auto mt-4">
+              Dive into specialized worlds of interest and find your next unforgettable experience.
+            </p>
+          </motion.div>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Card key={category.id} className="hover:shadow-lg transition-all hover:-translate-y-2 cursor-pointer border-transparent hover:border-primary/20 bg-background/50 backdrop-blur">
-                <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary mb-2">
-                    <Icon className="h-6 w-6" />
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-foreground">{category.name}</h3>
-                    <p className="text-xs text-muted-foreground mt-1">{category.count}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+          {isLoading ? (
+            [1, 2, 3, 4, 5, 6].map(i => (
+              <div key={i} className="h-40 bg-muted animate-pulse rounded-3xl" />
+            ))
+          ) : (
+            categories.map((category: any, index: number) => {
+              const Icon = iconMap[category.name] || iconMap[category.name.split(' ')[0]] || Globe;
+              return (
+                <motion.div
+                  key={category.id}
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  whileInView={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: index * 0.05 }}
+                  whileHover={{ y: -8 }}
+                >
+                  <Link href={`/events?category=${category.name}`}>
+                    <Card className="group h-full border-none bg-card/50 backdrop-blur-xl hover:bg-card hover:shadow-2xl transition-all duration-500 rounded-[2rem] cursor-pointer overflow-hidden shadow-lg shadow-black/5">
+                      <CardContent className="p-8 flex flex-col items-center text-center space-y-5">
+                        <div className="h-16 w-16 rounded-2xl bg-primary/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500 shadow-inner">
+                          <Icon className="h-8 w-8" />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-lg group-hover:text-primary transition-colors">{category.name}</h3>
+                          <p className="text-[10px] uppercase tracking-widest font-black text-muted-foreground mt-1 opacity-50">Discover</p>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  </Link>
+                </motion.div>
+              );
+            })
+          )}
         </div>
       </div>
+      
+      {/* Decorative Orbs */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] z-0" />
     </section>
   );
 }

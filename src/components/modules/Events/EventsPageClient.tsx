@@ -15,6 +15,9 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import Link from "next/link";
+import Image from "next/image";
+import { useDebounce } from "@/hooks/useDebounce";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface EventData {
   id: string;
@@ -25,25 +28,47 @@ interface EventData {
   fee: number;
   eventType: string;
   category?: { name: string };
+  bannerImage?: string;
 }
 
 export default function EventsPageClient() {
   const [searchTerm, setSearchTerm] = useState("");
   const [category, setCategory] = useState("all");
   const [type, setType] = useState("all");
+  const [page, setPage] = useState(1);
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
-  const { data: events, isLoading, error } = useQuery({
-    queryKey: ["events", searchTerm, category, type],
-    queryFn: async (): Promise<EventData[]> => {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["events", debouncedSearchTerm, category, type, page],
+    queryFn: async (): Promise<{ events: EventData[], meta: any }> => {
       const params = new URLSearchParams();
-      if (searchTerm) params.append("searchTerm", searchTerm);
+      if (debouncedSearchTerm) params.append("searchTerm", debouncedSearchTerm);
       if (category !== "all") params.append("category", category);
       if (type !== "all") params.append("type", type);
+      params.append("page", page.toString());
+      params.append("limit", "9"); // 9 items per page (3x3 grid)
       
       const { data } = await axiosInstance.get(`/events?${params.toString()}`);
       return data.data;
     },
   });
+
+  const { data: categoriesData } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/categories");
+      return data.data;
+    },
+  });
+
+  const events = data?.events || [];
+  const meta = data?.meta || { totalPages: 1 };
+  const categories = categoriesData || [];
+
+  const handleFilterChange = (setter: (val: string) => void, value: string) => {
+    setter(value);
+    setPage(1);
+  };
 
   return (
     <div className="container mx-auto px-4 py-12">
@@ -53,15 +78,18 @@ export default function EventsPageClient() {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2 relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Search by title, organizer, or description..." 
-              className="pl-10 h-12 rounded-xl"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+              <Input 
+                placeholder="Search by title, organizer, or description..." 
+                className="pl-10 h-12 rounded-xl"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setPage(1);
+                }}
+              />
           </div>
           
-          <Select value={category} onValueChange={setCategory}>
+          <Select value={category} onValueChange={(val) => handleFilterChange(setCategory, val)}>
             <SelectTrigger className="h-12 rounded-xl">
               <div className="flex items-center gap-2">
                 <Tag className="h-4 w-4" />
@@ -70,14 +98,13 @@ export default function EventsPageClient() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Categories</SelectItem>
-              <SelectItem value="Technology">Technology</SelectItem>
-              <SelectItem value="Music & Arts">Music & Arts</SelectItem>
-              <SelectItem value="Business">Business</SelectItem>
-              <SelectItem value="Health & Wellness">Health & Wellness</SelectItem>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
 
-          <Select value={type} onValueChange={setType}>
+          <Select value={type} onValueChange={(val) => handleFilterChange(setType, val)}>
             <SelectTrigger className="h-12 rounded-xl">
               <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4" />
@@ -109,9 +136,15 @@ export default function EventsPageClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {events?.map((event) => (
             <Card key={event.id} className="group overflow-hidden rounded-2xl border-border/50 hover:shadow-2xl transition-all duration-500 hover:-translate-y-1">
-              <div className="h-48 bg-muted relative">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 group-hover:opacity-70 transition-opacity" />
-                <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold shadow-sm">
+              <div className="h-48 bg-muted relative overflow-hidden">
+                <Image 
+                  src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"} 
+                  alt={event.title}
+                  fill
+                  className="object-cover group-hover:scale-110 transition-transform duration-700"
+                />
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 group-hover:opacity-40 transition-opacity" />
+                <div className="absolute top-4 right-4 bg-background/90 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold shadow-sm z-10">
                   {event.eventType.replace('_', ' ')}
                 </div>
               </div>
@@ -147,6 +180,44 @@ export default function EventsPageClient() {
               <Button variant="link" onClick={() => {setSearchTerm(""); setCategory("all"); setType("all");}}>Clear all filters</Button>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Pagination */}
+      {!isLoading && !error && meta.totalPages > 1 && (
+        <div className="mt-16 flex items-center justify-center gap-4">
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1}
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </Button>
+          
+          <div className="flex items-center gap-2">
+            {[...Array(meta.totalPages)].map((_, i) => (
+              <Button
+                key={i + 1}
+                variant={page === i + 1 ? "default" : "outline"}
+                className={`w-12 h-12 rounded-full font-bold ${page === i + 1 ? "shadow-lg shadow-primary/20" : ""}`}
+                onClick={() => setPage(i + 1)}
+              >
+                {i + 1}
+              </Button>
+            ))}
+          </div>
+
+          <Button
+            variant="outline"
+            size="icon"
+            className="rounded-full h-12 w-12"
+            onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
+            disabled={page === meta.totalPages}
+          >
+            <ChevronRight className="h-5 w-5" />
+          </Button>
         </div>
       )}
     </div>

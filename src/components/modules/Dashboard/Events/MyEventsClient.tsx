@@ -28,16 +28,50 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import Link from "next/link";
 import { toast } from "sonner";
+import { authClient } from "@/lib/auth-client";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Search, Tag, Filter } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 
 export default function MyEventsClient() {
   const queryClient = useQueryClient();
-  const { data: events = [], isLoading } = useQuery({
-    queryKey: ["my-events"],
+  const { data: session } = authClient.useSession();
+  
+  const [searchTerm, setSearchTerm] = useState("");
+  const [category, setCategory] = useState("all");
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
+  const { data, isLoading } = useQuery({
+    queryKey: ["my-events", session?.user?.id, debouncedSearchTerm, category],
     queryFn: async () => {
-      const { data } = await axiosInstance.get("/events");
+      const params = new URLSearchParams();
+      params.append("limit", "100");
+      params.append("organizerId", session?.user?.id as string);
+      if (debouncedSearchTerm) params.append("searchTerm", debouncedSearchTerm);
+      if (category !== "all") params.append("category", category);
+      
+      const { data } = await axiosInstance.get(`/events?${params.toString()}`);
+      return data.data;
+    },
+    enabled: !!session?.user?.id,
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/categories");
       return data.data;
     },
   });
+
+  const events = data?.events || [];
 
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this event?")) return;
@@ -53,14 +87,37 @@ export default function MyEventsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/50 p-6 rounded-2xl border border-border/50">
+        <div className="space-y-1">
           <h2 className="text-3xl font-bold tracking-tight">My Events</h2>
-          <p className="text-muted-foreground">
-            Manage the events you are organizing.
-          </p>
+          <p className="text-muted-foreground">Manage and track your organized event portfolio.</p>
         </div>
-        <CreateEventDialog />
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="relative w-full sm:w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Search your events..." 
+              className="pl-10 rounded-xl"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
+          <Select value={category} onValueChange={setCategory}>
+            <SelectTrigger className="w-[180px] rounded-xl">
+              <div className="flex items-center gap-2">
+                <Tag className="h-4 w-4" />
+                <SelectValue placeholder="Category" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map((cat: any) => (
+                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <CreateEventDialog />
+        </div>
       </div>
 
       {isLoading ? (

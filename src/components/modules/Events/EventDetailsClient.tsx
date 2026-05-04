@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import Link from "next/link";
+import Image from "next/image";
 import { Calendar, MapPin, Users, Info, ShieldCheck, Clock, Share2, Heart, Tag, User, Star, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -91,14 +92,25 @@ export default function EventDetailsClient() {
     <div className="min-h-screen bg-background pb-24">
       {/* Hero Section */}
       <div className="relative w-full h-[40vh] md:h-[50vh] lg:h-[60vh] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/20 to-background z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/80 via-transparent to-transparent z-10 hidden md:block" />
+        <Image 
+          src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"} 
+          alt={event.title}
+          fill
+          className="object-cover"
+          priority
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background z-10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent z-10 hidden md:block" />
         
         {/* Fallback pattern if no image */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/20 via-secondary/10 to-transparent animate-slow-pulse" />
-        <div className="absolute inset-0 flex items-center justify-center opacity-30">
-           <div className="w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]" />
-        </div>
+        {!event.bannerImage && (
+          <>
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary/20 via-secondary/10 to-transparent animate-slow-pulse" />
+            <div className="absolute inset-0 flex items-center justify-center opacity-30">
+               <div className="w-[800px] h-[800px] bg-primary/10 rounded-full blur-[120px]" />
+            </div>
+          </>
+        )}
 
         <div className="container mx-auto h-full px-4 relative z-20 flex flex-col justify-end pb-12">
           <div className="max-w-3xl space-y-4">
@@ -320,9 +332,15 @@ export default function EventDetailsClient() {
                 <div className="grid md:grid-cols-2 gap-6">
                   {event.relatedEvents.map((related: any) => (
                     <Card key={related.id} className="group overflow-hidden rounded-3xl border-border/50 hover:shadow-xl transition-all duration-500">
-                      <div className="h-40 bg-muted relative">
-                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10" />
-                        <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold">
+                      <div className="h-40 bg-muted relative overflow-hidden">
+                        <Image 
+                          src={related.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"} 
+                          alt={related.title}
+                          fill
+                          className="object-cover group-hover:scale-110 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 group-hover:opacity-40 transition-opacity" />
+                        <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-md px-3 py-1 rounded-full text-xs font-bold z-10">
                           {related.eventType.replace('_', ' ')}
                         </div>
                       </div>

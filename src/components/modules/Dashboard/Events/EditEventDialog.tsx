@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
-import { useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -59,7 +59,6 @@ interface EditEventDialogProps {
 
 export default function EditEventDialog({ event }: EditEventDialogProps) {
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -85,28 +84,32 @@ export default function EditEventDialog({ event }: EditEventDialogProps) {
     },
   });
 
-  async function onSubmit(data: EventFormValues) {
-    setIsLoading(true);
-    try {
-      const response = await axiosInstance.patch(`/events/${event.id}`, {
-        ...data,
-        date: new Date(data.date).toISOString(),
+  const updateEventMutation = useMutation({
+    mutationFn: async (eventData: any) => {
+      const { data } = await axiosInstance.patch(`/events/${event.id}`, {
+        ...eventData,
+        date: new Date(eventData.date).toISOString(),
       });
-
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Failed to update event");
+      return data;
+    },
+    onSuccess: (data) => {
+      if (!data.success) {
+        throw new Error(data.message || "Failed to update event");
       }
-
       toast.success("Event updated successfully");
       queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
       setOpen(false);
       router.refresh();
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast.error(error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  async function onSubmit(data: EventFormValues) {
+    updateEventMutation.mutate(data);
   }
 
   return (
@@ -264,8 +267,8 @@ export default function EditEventDialog({ event }: EditEventDialogProps) {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Saving..." : "Save Changes"}
+              <Button type="submit" disabled={updateEventMutation.isPending}>
+                {updateEventMutation.isPending ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

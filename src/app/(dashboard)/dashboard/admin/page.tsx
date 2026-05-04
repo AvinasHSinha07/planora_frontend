@@ -9,6 +9,9 @@ export const metadata: Metadata = {
   description: "Manage system operations",
 };
 
+import { Suspense } from "react";
+import { Loader2 } from "lucide-react";
+
 export default async function AdminPage() {
   const { data: session } = await authClient.getSession({
     fetchOptions: {
@@ -20,5 +23,13 @@ export default async function AdminPage() {
     redirect("/dashboard");
   }
 
-  return <AdminClient />;
+  return (
+    <Suspense fallback={
+      <div className="flex h-[400px] items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+      </div>
+    }>
+      <AdminClient />
+    </Suspense>
+  );
 }

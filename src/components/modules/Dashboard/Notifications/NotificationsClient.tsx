@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -20,13 +20,20 @@ export default function NotificationsClient() {
     },
   });
 
-  const handleMarkAsRead = async (id: string) => {
-    try {
+  const markAsReadMutation = useMutation({
+    mutationFn: async (id: string) => {
       await axiosInstance.patch(`/notifications/${id}/read`);
+    },
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["my-notifications"] });
-    } catch (error: any) {
+    },
+    onError: () => {
       toast.error("Failed to mark as read");
-    }
+    },
+  });
+
+  const handleMarkAsRead = (id: string) => {
+    markAsReadMutation.mutate(id);
   };
 
   const getIcon = (title: string) => {
@@ -89,8 +96,9 @@ export default function NotificationsClient() {
                         size="sm" 
                         className="h-8 px-3 rounded-lg text-xs gap-2 hover:bg-primary/5 hover:text-primary"
                         onClick={() => handleMarkAsRead(notification.id)}
+                        disabled={markAsReadMutation.isPending}
                       >
-                         <Check className="w-3 h-3" /> Mark as read
+                         {markAsReadMutation.isPending ? <Loader2 className="w-3 h-3 animate-spin" /> : <Check className="w-3 h-3" />} Mark as read
                       </Button>
                    </div>
                  )}

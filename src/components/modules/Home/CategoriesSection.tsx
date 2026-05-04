@@ -19,13 +19,14 @@ const iconMap: Record<string, any> = {
   "Day Out": Globe
 };
 
-export default function CategoriesSection() {
+export default function CategoriesSection({ initialData }: { initialData?: any[] }) {
   const { data: categories = [], isLoading } = useQuery({
     queryKey: ["categories"],
     queryFn: async () => {
       const { data } = await axiosInstance.get("/categories");
       return data.data;
     },
+    initialData: initialData,
   });
 
   return (

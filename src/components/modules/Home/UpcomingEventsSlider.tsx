@@ -21,14 +21,15 @@ import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
-export default function UpcomingEventsSlider() {
+export default function UpcomingEventsSlider({ initialData }: { initialData?: any[] }) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [events, setEvents] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [events, setEvents] = useState<any[]>(initialData || []);
+  const [loading, setLoading] = useState(!initialData);
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
     const fetchEvents = async () => {
+      if (initialData) return;
       try {
         const { data } = await axiosInstance.get("/events?type=PUBLIC_FREE,PUBLIC_PAID&limit=6");
         setEvents(data.data?.events || []);
@@ -39,7 +40,7 @@ export default function UpcomingEventsSlider() {
       }
     };
     fetchEvents();
-  }, []);
+  }, [initialData]);
 
   useEffect(() => {
     if (!loading && containerRef.current) {
@@ -77,6 +78,7 @@ export default function UpcomingEventsSlider() {
             src={events[activeIndex]?.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"}
             alt="bg"
             fill
+            priority
             className="object-cover blur-[100px] scale-110"
           />
         </motion.div>
@@ -143,6 +145,7 @@ export default function UpcomingEventsSlider() {
                       src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"}
                       alt={event.title}
                       fill
+                      priority={index === 0}
                       className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                     

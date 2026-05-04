@@ -8,14 +8,22 @@ import TestimonialsSection from "./TestimonialsSection";
 import NewsletterSection from "./NewsletterSection";
 import CTASection from "./CTASection";
 
-export default function HomeClient() {
+export default function HomeClient({ 
+  initialFeaturedEvents, 
+  initialUpcomingEvents,
+  initialCategories
+}: { 
+  initialFeaturedEvents: any;
+  initialUpcomingEvents: any;
+  initialCategories: any;
+}) {
   return (
     <>
       <HeroSection />
-      <UpcomingEventsSlider />
+      <UpcomingEventsSlider initialData={initialUpcomingEvents} />
       <HowItWorksSection />
-      <CategoriesSection />
-      <FeaturedEvents />
+      <CategoriesSection initialData={initialCategories} />
+      <FeaturedEvents initialData={initialFeaturedEvents} />
       <StatisticsSection />
       <TestimonialsSection />
       <NewsletterSection />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
@@ -17,13 +17,12 @@ import { authClient } from "@/lib/auth-client";
 import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 
-export default function EventDetailsClient() {
+export default function EventDetailsClient({ initialData }: { initialData: any }) {
   const { id } = useParams();
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
-  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
@@ -31,50 +30,67 @@ export default function EventDetailsClient() {
       const { data } = await axiosInstance.get(`/events/${id}`);
       return data.data;
     },
+    initialData: initialData,
   });
 
   const isParticipant = event?.participants?.some((p: any) => p.userId === session?.user?.id && p.status === "APPROVED");
   const hasAlreadyReviewed = event?.reviews?.some((r: any) => r.userId === session?.user?.id);
 
-  const handleSubmitReview = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!reviewComment) return;
-    setIsSubmittingReview(true);
-    try {
-      await axiosInstance.post("/reviews", {
-        eventId: event.id,
-        rating: reviewRating,
-        comment: reviewComment
-      });
+  const reviewMutation = useMutation({
+    mutationFn: async (newReview: { eventId: string; rating: number; comment: string }) => {
+      const { data } = await axiosInstance.post("/reviews", newReview);
+      return data;
+    },
+    onSuccess: () => {
       toast.success("Review submitted successfully!");
       setReviewComment("");
       setReviewRating(5);
-      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
-    } catch (error: any) {
+      queryClient.invalidateQueries({ queryKey: ["event", id] });
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to submit review");
-    } finally {
-      setIsSubmittingReview(false);
-    }
+    },
+  });
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewComment) return;
+    reviewMutation.mutate({
+      eventId: event.id,
+      rating: reviewRating,
+      comment: reviewComment,
+    });
   };
 
   const averageRating = event?.reviews?.length 
     ? (event.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / event.reviews.length).toFixed(1)
     : "0";
 
-  const handleJoin = async () => {
-    try {
+  const joinMutation = useMutation({
+    mutationFn: async () => {
       if (event.fee > 0) {
         const { data } = await axiosInstance.post("/payments/create-session", { eventId: event.id });
-        if (data.data?.url) {
-          window.location.href = data.data.url;
-        }
+        return data.data;
       } else {
-        await axiosInstance.post("/participations/join", { eventId: event.id });
-        toast.success("Successfully joined the event!");
+        const { data } = await axiosInstance.post("/participations/join", { eventId: event.id });
+        return data;
       }
-    } catch (error) {
+    },
+    onSuccess: (data) => {
+      if (event.fee > 0 && data?.url) {
+        window.location.href = data.url;
+      } else {
+        toast.success("Successfully joined the event!");
+        queryClient.invalidateQueries({ queryKey: ["event", id] });
+      }
+    },
+    onError: () => {
       toast.error("Failed to join event");
-    }
+    },
+  });
+
+  const handleJoin = async () => {
+    joinMutation.mutate();
   };
 
   if (isLoading) {
@@ -272,9 +288,9 @@ export default function EventDetailsClient() {
                       <Button 
                         type="submit" 
                         className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-primary/20"
-                        disabled={isSubmittingReview || !reviewComment}
+                        disabled={reviewMutation.isPending || !reviewComment}
                       >
-                        {isSubmittingReview ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Post Review"}
+                        {reviewMutation.isPending ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Post Review"}
                       </Button>
                     </form>
                   </CardContent>
@@ -412,8 +428,15 @@ export default function EventDetailsClient() {
                       size="lg" 
                       className="w-full text-lg h-16 rounded-2xl shadow-lg shadow-primary/25 hover:scale-[1.02] active:scale-95 transition-all duration-300 font-bold" 
                       onClick={handleJoin}
+                      disabled={joinMutation.isPending}
                     >
-                      {event.fee > 0 ? "Secure Your Spot" : "Register Now"}
+                      {joinMutation.isPending ? (
+                        <Loader2 className="w-5 h-5 animate-spin mr-2" />
+                      ) : event.fee > 0 ? (
+                        "Secure Your Spot"
+                      ) : (
+                        "Register Now"
+                      )}
                     </Button>
                   </div>
 

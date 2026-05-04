@@ -9,7 +9,7 @@ import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -56,7 +56,6 @@ type EventFormValues = z.infer<typeof eventFormSchema>;
 
 export default function CreateEventDialog() {
   const [open, setOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const queryClient = useQueryClient();
 
@@ -88,29 +87,32 @@ export default function CreateEventDialog() {
 
  
 
-  async function onSubmit(data: EventFormValues) {
-    setIsLoading(true);
-    try {
-      const response = await axiosInstance.post("/events", {
-        ...data,
-        date: new Date(data.date).toISOString(),
+  const createEventMutation = useMutation({
+    mutationFn: async (eventData: any) => {
+      const { data } = await axiosInstance.post("/events", {
+        ...eventData,
+        date: new Date(eventData.date).toISOString(),
       });
-
-      if (!response.data.success) {
-        throw new Error(response.data.message || "Failed to create event");
+      return data;
+    },
+    onSuccess: (data) => {
+      if (!data.success) {
+        throw new Error(data.message || "Failed to create event");
       }
-
       toast.success("Event created successfully");
       queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       setOpen(false);
       form.reset();
       router.refresh();
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast.error(error.message || "An error occurred");
-    } finally {
-      setIsLoading(false);
-    }
+    },
+  });
+
+  async function onSubmit(data: EventFormValues) {
+    createEventMutation.mutate(data);
   }
 
   return (
@@ -275,8 +277,8 @@ export default function CreateEventDialog() {
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Event"}
+              <Button type="submit" disabled={createEventMutation.isPending}>
+                {createEventMutation.isPending ? "Creating..." : "Create Event"}
               </Button>
             </DialogFooter>
           </form>

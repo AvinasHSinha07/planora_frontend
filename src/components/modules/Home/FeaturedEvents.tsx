@@ -21,12 +21,13 @@ const fetchFeaturedEvents = async () => {
   return data.data; 
 };
 
-export default function FeaturedEvents() {
+export default function FeaturedEvents({ initialData }: { initialData: any }) {
   const [emblaRef] = useEmblaCarousel({ loop: true, align: "start", skipSnaps: false });
 
   const { data, isLoading } = useQuery({
     queryKey: ["featured-events"],
     queryFn: fetchFeaturedEvents,
+    initialData: initialData,
   });
 
   const events = data?.events || [];
@@ -78,6 +79,7 @@ export default function FeaturedEvents() {
                         src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000"} 
                         alt={event.title}
                         fill
+                        priority={index < 2}
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />

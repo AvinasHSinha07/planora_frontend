@@ -1,6 +1,6 @@
 "use client";
 
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -21,25 +21,34 @@ export default function InvitationsClient() {
     },
   });
 
-  const handleStatusUpdate = async (invitation: any, status: string) => {
-    try {
+  const statusMutation = useMutation({
+    mutationFn: async ({ invitation, status }: { invitation: any; status: string }) => {
       // If event is paid and we are approving, we might need to trigger payment
       if (status === "APPROVED" && invitation.event.fee > 0) {
          toast.info("This is a paid event. Redirecting to payment...");
          const { data } = await axiosInstance.post("/payments/create-session", { eventId: invitation.event.id });
-         if (data.data?.url) {
-           window.location.href = data.data.url;
-           return;
-         }
+         return { url: data.data?.url };
       }
 
-      await axiosInstance.patch(`/invitations/${invitation.id}/status`, { status });
-      toast.success(`Invitation ${status === "APPROVED" ? "accepted" : "declined"}`);
+      const { data } = await axiosInstance.patch(`/invitations/${invitation.id}/status`, { status });
+      return { status, data };
+    },
+    onSuccess: (result: any) => {
+      if (result.url) {
+        window.location.href = result.url;
+        return;
+      }
+      toast.success(`Invitation ${result.status === "APPROVED" ? "accepted" : "declined"}`);
       queryClient.invalidateQueries({ queryKey: ["my-invitations"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard-stats"] });
-    } catch (error: any) {
+    },
+    onError: (error: any) => {
       toast.error(error.response?.data?.message || "Failed to update invitation");
-    }
+    },
+  });
+
+  const handleStatusUpdate = (invitation: any, status: string) => {
+    statusMutation.mutate({ invitation, status });
   };
 
   if (isLoading) {
@@ -117,14 +126,16 @@ export default function InvitationsClient() {
                 <Button 
                   className="flex-1 rounded-2xl gap-2" 
                   onClick={() => handleStatusUpdate(invitation, "APPROVED")}
+                  disabled={statusMutation.isPending}
                 >
-                  <Check className="w-4 h-4" /> 
+                  {statusMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} 
                   {invitation.event.fee > 0 ? "Pay & Accept" : "Accept"}
                 </Button>
                 <Button 
                   variant="outline" 
                   className="flex-1 rounded-2xl gap-2 border-destructive/20 text-destructive hover:bg-destructive/5"
                   onClick={() => handleStatusUpdate(invitation, "REJECTED")}
+                  disabled={statusMutation.isPending}
                 >
                   <X className="w-4 h-4" /> Decline
                 </Button>

@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 import axiosInstance from "@/lib/axiosInstance";
 import { format } from "date-fns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,11 +8,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Users, Calendar as CalendarIcon, AlertTriangle, ShieldCheck, Trash2, Ban, Star } from "lucide-react";
+import { Users, Calendar as CalendarIcon, AlertTriangle, ShieldCheck, Trash2, Ban, Star, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 
 export default function AdminClient() {
+  const queryClient = useQueryClient();
+
   const [activeTab, setActiveTab] = useState("users");
 
   const { data: stats } = useQuery({
@@ -24,7 +26,7 @@ export default function AdminClient() {
     },
   });
 
-  const { data: users, refetch: refetchUsers } = useQuery({
+  const { data: users } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
       const { data } = await axiosInstance.get("/admin/users");
@@ -33,7 +35,7 @@ export default function AdminClient() {
     enabled: activeTab === "users",
   });
 
-  const { data: events, refetch: refetchEvents } = useQuery({
+  const { data: events } = useQuery({
     queryKey: ["admin-events"],
     queryFn: async () => {
       const { data } = await axiosInstance.get("/admin/events");
@@ -42,18 +44,46 @@ export default function AdminClient() {
     enabled: activeTab === "events",
   });
 
-  const handleAction = async (method: 'post' | 'delete' | 'patch', endpoint: string, successMsg: string, refetchFn: () => void, body?: any) => {
-    try {
-      if (method === 'post') await axiosInstance.post(endpoint, body);
-      else if (method === 'delete') await axiosInstance.delete(endpoint);
-      else if (method === 'patch') await axiosInstance.patch(endpoint, body);
-      
-      toast.success(successMsg);
-      refetchFn();
-    } catch (error: any) {
-      toast.error(error?.response?.data?.message || "Action failed");
-    }
-  };
+  const deleteUserMutation = useMutation({
+    mutationFn: async (userId: string) => {
+      await axiosInstance.delete(`/admin/users/${userId}`);
+    },
+    onSuccess: () => {
+      toast.success("User deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-users"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to delete user");
+    },
+  });
+
+  const deleteEventMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      await axiosInstance.delete(`/admin/events/${eventId}`);
+    },
+    onSuccess: () => {
+      toast.success("Event deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+      queryClient.invalidateQueries({ queryKey: ["admin-stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to delete event");
+    },
+  });
+
+  const toggleFeatureMutation = useMutation({
+    mutationFn: async ({ eventId, isFeatured }: { eventId: string; isFeatured: boolean }) => {
+      await axiosInstance.patch(`/admin/events/${eventId}/feature`, { isFeatured });
+    },
+    onSuccess: () => {
+      toast.success("Feature status updated");
+      queryClient.invalidateQueries({ queryKey: ["admin-events"] });
+    },
+    onError: (error: any) => {
+      toast.error(error?.response?.data?.message || "Failed to update feature status");
+    },
+  });
 
   return (
     <div className="space-y-6">
@@ -137,13 +167,14 @@ export default function AdminClient() {
                           size="icon" 
                           className="text-destructive hover:bg-destructive/10"
                           title="Delete User"
+                          disabled={deleteUserMutation.isPending}
                           onClick={() => {
                             if (confirm("Are you sure you want to delete this user? This cannot be undone.")) {
-                              handleAction('delete', `/admin/users/${user.id}`, "User deleted", refetchUsers);
+                              deleteUserMutation.mutate(user.id);
                             }
                           }}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          {deleteUserMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -190,22 +221,24 @@ export default function AdminClient() {
                             size="icon" 
                             className={event.isFeatured ? "text-amber-500" : "text-muted-foreground"}
                             title={event.isFeatured ? "Unfeature Event" : "Feature Event"}
-                            onClick={() => handleAction('patch', `/admin/events/${event.id}/feature`, "Feature status updated", refetchEvents, { isFeatured: !event.isFeatured })}
+                            disabled={toggleFeatureMutation.isPending}
+                            onClick={() => toggleFeatureMutation.mutate({ eventId: event.id, isFeatured: !event.isFeatured })}
                           >
-                            <Star className={cn("h-4 w-4", event.isFeatured && "fill-current")} />
+                            {toggleFeatureMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Star className={cn("h-4 w-4", event.isFeatured && "fill-current")} />}
                           </Button>
                           <Button 
                             variant="ghost" 
                             size="icon" 
                             className="text-destructive hover:bg-destructive/10"
                             title="Delete Event"
+                            disabled={deleteEventMutation.isPending}
                             onClick={() => {
                               if (confirm("Delete this event?")) {
-                                handleAction('delete', `/admin/events/${event.id}`, "Event deleted", refetchEvents);
+                                deleteEventMutation.mutate(event.id);
                               }
                             }}
                           >
-                            <Trash2 className="h-4 w-4" />
+                            {deleteEventMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
                           </Button>
                         </div>
                       </TableCell>

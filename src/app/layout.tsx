@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
-import PlanoraBot from "@/components/shared/PlanoraBot";
+import BotWrapper from "@/components/shared/BotWrapper";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -46,7 +46,7 @@ export default function RootLayout({
               </div>
             </LenisProvider>
             <Toaster position="top-center" richColors />
-            <PlanoraBot />
+            <BotWrapper />
           </QueryProvider>
         </ThemeProvider>
       </body>

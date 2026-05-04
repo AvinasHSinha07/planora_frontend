@@ -2,11 +2,12 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import LenisProvider from "@/providers/LenisProvider";
-import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ThemeProvider as NextThemesProvider, ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
 import BotWrapper from "@/components/shared/BotWrapper";
+import ScrollToTop from "@/components/shared/ScrollToTop";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 
@@ -34,9 +35,11 @@ export default function RootLayout({
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
+          enableColorScheme={false}
         >
           <QueryProvider>
             <LenisProvider>
+              <ScrollToTop />
               <div className="flex flex-col min-h-screen">
                 <Navbar />
                 <main className="flex-1">

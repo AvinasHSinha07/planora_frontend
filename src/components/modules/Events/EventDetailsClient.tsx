@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -19,6 +19,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function EventDetailsClient({ initialData }: { initialData: any }) {
   const { id } = useParams();
+  const router = useRouter();
   const queryClient = useQueryClient();
   const { data: session } = authClient.useSession();
   const [reviewComment, setReviewComment] = useState("");
@@ -82,6 +83,10 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
       } else {
         toast.success("Successfully joined the event!");
         queryClient.invalidateQueries({ queryKey: ["event", id] });
+        queryClient.invalidateQueries({ queryKey: ["my-participations"] });
+        setTimeout(() => {
+          router.push("/dashboard/participations");
+        }, 1500);
       }
     },
     onError: () => {

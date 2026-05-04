@@ -4,6 +4,7 @@ import Link from "next/link";
 import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { ThemeToggle } from "./ThemeToggle";
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
@@ -29,6 +30,7 @@ export default function Navbar() {
           <Link href="/about" className="text-sm font-medium hover:text-primary transition-colors">About</Link>
         </nav>
         <div className="flex items-center gap-4">
+          <ThemeToggle />
           {isPending ? (
             <div className="h-8 w-20 bg-muted animate-pulse rounded-full" />
           ) : session ? (

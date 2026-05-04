@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Geist } from "next/font/google";
+import { Geist } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import LenisProvider from "@/providers/LenisProvider";
-import { ThemeProvider } from "@/providers/ThemeProvider";
+import { ThemeProvider as NextThemesProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import Navbar from "@/components/shared/Navbar";
+import Footer from "@/components/shared/Footer";
 import PlanoraBot from "@/components/shared/PlanoraBot";
 import "./globals.css";
 import { cn } from "@/lib/utils";
@@ -27,7 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex flex-col font-sans min-h-screen" suppressHydrationWarning>
-        <ThemeProvider
+        <NextThemesProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
@@ -35,12 +37,18 @@ export default function RootLayout({
         >
           <QueryProvider>
             <LenisProvider>
-              {children}
+              <div className="flex flex-col min-h-screen">
+                <Navbar />
+                <main className="flex-1">
+                  {children}
+                </main>
+                <Footer />
+              </div>
             </LenisProvider>
             <Toaster position="top-center" richColors />
             <PlanoraBot />
           </QueryProvider>
-        </ThemeProvider>
+        </NextThemesProvider>
       </body>
     </html>
   );

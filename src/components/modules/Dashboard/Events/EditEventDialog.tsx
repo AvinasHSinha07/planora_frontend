@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { CalendarIcon, Plus } from "lucide-react";
+import { Edit } from "lucide-react";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useQuery } from "@tanstack/react-query";
 
 import {
   Dialog,
@@ -24,7 +24,6 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -39,7 +38,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { DropdownMenuItem } from "@/components/ui/dropdown-menu";
 
 const eventFormSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters").max(100),
@@ -54,7 +53,11 @@ const eventFormSchema = z.object({
 
 type EventFormValues = z.infer<typeof eventFormSchema>;
 
-export default function CreateEventDialog() {
+interface EditEventDialogProps {
+  event: any;
+}
+
+export default function EditEventDialog({ event }: EditEventDialogProps) {
   const [open, setOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
@@ -67,44 +70,37 @@ export default function CreateEventDialog() {
       return data.data;
     }
   });
- const form = useForm<z.infer<typeof eventFormSchema>>({
+
+  const form = useForm<z.infer<typeof eventFormSchema>>({
     resolver: zodResolver(eventFormSchema as any),
     defaultValues: {
-      title: "",
-      description: "",
-      date: "",
-      venue: "",
-      eventLink: "",
-      fee: 0,
-      eventType: "PUBLIC_FREE",
-      categoryId: "",
+      title: event.title,
+      description: event.description,
+      date: format(new Date(event.date), "yyyy-MM-dd'T'HH:mm"),
+      venue: event.venue || "",
+      eventLink: event.eventLink || "",
+      fee: event.fee,
+      eventType: event.eventType,
+      categoryId: event.categoryId,
     },
   });
-  useEffect(() => {
-    if (categories && categories.length > 0 && !form.getValues("categoryId")) {
-      form.setValue("categoryId", categories[0].id);
-    }
-  }, [categories, form]);
-
- 
 
   async function onSubmit(data: EventFormValues) {
     setIsLoading(true);
     try {
-      const response = await axiosInstance.post("/events", {
+      const response = await axiosInstance.patch(`/events/${event.id}`, {
         ...data,
         date: new Date(data.date).toISOString(),
       });
 
       if (!response.data.success) {
-        throw new Error(response.data.message || "Failed to create event");
+        throw new Error(response.data.message || "Failed to update event");
       }
 
-      toast.success("Event created successfully");
+      toast.success("Event updated successfully");
       queryClient.invalidateQueries({ queryKey: ["my-events"] });
       queryClient.invalidateQueries({ queryKey: ["events"] });
       setOpen(false);
-      form.reset();
       router.refresh();
     } catch (error: any) {
       toast.error(error.message || "An error occurred");
@@ -116,23 +112,23 @@ export default function CreateEventDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" /> Create Event
-        </Button>
+        <DropdownMenuItem onSelect={(e) => { e.preventDefault(); setOpen(true); }}>
+          Edit Event
+        </DropdownMenuItem>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create New Event</DialogTitle>
+          <DialogTitle>Edit Event</DialogTitle>
           <DialogDescription>
-            Fill in the details below to create a new event. Click save when you're done.
+            Update the details of your event below. Click save when you're done.
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit((d) => onSubmit(d))} className="space-y-6">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
               name="title"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Event Title</FormLabel>
                   <FormControl>
@@ -145,7 +141,7 @@ export default function CreateEventDialog() {
             <FormField
               control={form.control}
               name="description"
-              render={({ field }: { field: any }) => (
+              render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
@@ -163,7 +159,7 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="date"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Date & Time</FormLabel>
                     <FormControl>
@@ -176,10 +172,10 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="eventType"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Event Type</FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select type" />
@@ -201,7 +197,7 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="venue"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Venue (Optional)</FormLabel>
                     <FormControl>
@@ -214,7 +210,7 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="eventLink"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Online Link (Optional)</FormLabel>
                     <FormControl>
@@ -229,7 +225,7 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="fee"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Registration Fee ($)</FormLabel>
                     <FormControl>
@@ -242,28 +238,21 @@ export default function CreateEventDialog() {
               <FormField
                 control={form.control}
                 name="categoryId"
-                render={({ field }: { field: any }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Category</FormLabel>
-                    <Select 
-                      onValueChange={field.onChange} 
-                      value={field.value}
-                    >
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue placeholder="Select category" />
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
-                        {categories && categories.length > 0 ? (
-                          categories.map((cat: any) => (
-                            <SelectItem key={cat.id} value={cat.id}>
-                              {cat.name}
-                            </SelectItem>
-                          ))
-                        ) : (
-                          <div className="p-2 text-xs text-muted-foreground">Loading categories...</div>
-                        )}
+                        {categories?.map((cat: any) => (
+                          <SelectItem key={cat.id} value={cat.id}>
+                            {cat.name}
+                          </SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                     <FormMessage />
@@ -276,7 +265,7 @@ export default function CreateEventDialog() {
                 Cancel
               </Button>
               <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Creating..." : "Create Event"}
+                {isLoading ? "Saving..." : "Save Changes"}
               </Button>
             </DialogFooter>
           </form>

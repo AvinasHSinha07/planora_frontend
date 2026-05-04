@@ -15,6 +15,14 @@ import { toast } from "sonner";
 export default function AdminClient() {
   const [activeTab, setActiveTab] = useState("users");
 
+  const { data: stats } = useQuery({
+    queryKey: ["admin-stats"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/admin/stats");
+      return data.data;
+    },
+  });
+
   const { data: users, refetch: refetchUsers } = useQuery({
     queryKey: ["admin-users"],
     queryFn: async () => {
@@ -33,9 +41,12 @@ export default function AdminClient() {
     enabled: activeTab === "events",
   });
 
-  const handleAction = async (endpoint: string, successMsg: string, refetchFn: () => void) => {
+  const handleAction = async (method: 'post' | 'delete' | 'patch', endpoint: string, successMsg: string, refetchFn: () => void, body?: any) => {
     try {
-      await axiosInstance.post(endpoint);
+      if (method === 'post') await axiosInstance.post(endpoint, body);
+      else if (method === 'delete') await axiosInstance.delete(endpoint);
+      else if (method === 'patch') await axiosInstance.patch(endpoint, body);
+      
       toast.success(successMsg);
       refetchFn();
     } catch (error: any) {
@@ -59,7 +70,7 @@ export default function AdminClient() {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{users?.length || "..."}</div>
+            <div className="text-2xl font-bold">{stats?.users || "..."}</div>
           </CardContent>
         </Card>
         <Card>
@@ -68,25 +79,25 @@ export default function AdminClient() {
             <CalendarIcon className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{events?.length || "..."}</div>
+            <div className="text-2xl font-bold">{stats?.events || "..."}</div>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Reports</CardTitle>
-            <AlertTriangle className="h-4 w-4 text-destructive" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">12</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">System Status</CardTitle>
+            <CardTitle className="text-sm font-medium">Platform Revenue</CardTitle>
             <ShieldCheck className="h-4 w-4 text-emerald-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-emerald-500">Healthy</div>
+            <div className="text-2xl font-bold text-emerald-500">${stats?.revenue?.toLocaleString() || "0"}</div>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            <CardTitle className="text-sm font-medium">System Health</CardTitle>
+            <ShieldCheck className="h-4 w-4 text-emerald-500" />
+          </CardHeader>
+          <CardContent>
+            <div className="text-2xl font-bold text-emerald-500">Online</div>
           </CardContent>
         </Card>
       </div>
@@ -124,9 +135,14 @@ export default function AdminClient() {
                           variant="ghost" 
                           size="icon" 
                           className="text-destructive hover:bg-destructive/10"
-                          onClick={() => handleAction(`/admin/users/${user.id}/ban`, "User banned", refetchUsers)}
+                          title="Delete User"
+                          onClick={() => {
+                            if (confirm("Are you sure you want to delete this user? This cannot be undone.")) {
+                              handleAction('delete', `/admin/users/${user.id}`, "User deleted", refetchUsers);
+                            }
+                          }}
                         >
-                          <Ban className="h-4 w-4" />
+                          <Trash2 className="h-4 w-4" />
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -167,14 +183,30 @@ export default function AdminClient() {
                       </TableCell>
                       <TableCell>{format(new Date(event.date), "MMM d, yyyy")}</TableCell>
                       <TableCell className="text-right">
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="text-destructive hover:bg-destructive/10"
-                          onClick={() => handleAction(`/admin/events/${event.id}/delete`, "Event deleted", refetchEvents)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                        <div className="flex justify-end gap-2">
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className={event.isFeatured ? "text-amber-500" : "text-muted-foreground"}
+                            title={event.isFeatured ? "Unfeature Event" : "Feature Event"}
+                            onClick={() => handleAction('patch', `/admin/events/${event.id}/feature`, "Feature status updated", refetchEvents, { isFeatured: !event.isFeatured })}
+                          >
+                            <Star className={cn("h-4 w-4", event.isFeatured && "fill-current")} />
+                          </Button>
+                          <Button 
+                            variant="ghost" 
+                            size="icon" 
+                            className="text-destructive hover:bg-destructive/10"
+                            title="Delete Event"
+                            onClick={() => {
+                              if (confirm("Delete this event?")) {
+                                handleAction('delete', `/admin/events/${event.id}`, "Event deleted", refetchEvents);
+                              }
+                            }}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}

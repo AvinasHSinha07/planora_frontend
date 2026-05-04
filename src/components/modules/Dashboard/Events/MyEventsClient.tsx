@@ -21,33 +21,35 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import CreateEventDialog from "./CreateEventDialog";
+import EditEventDialog from "./EditEventDialog";
+import ManageParticipantsDialog from "./ManageParticipantsDialog";
 
-// This would typically come from an API
-const mockEvents = [
-  {
-    id: "1",
-    title: "Global Tech Summit 2026",
-    date: new Date("2026-06-15T09:00:00"),
-    venue: "Convention Center",
-    status: "Upcoming",
-    type: "PUBLIC_PAID",
-    participants: 120,
-    revenue: 12000,
-  },
-  {
-    id: "2",
-    title: "Startup Networking Mixer",
-    date: new Date("2026-05-20T18:00:00"),
-    venue: "Downtown Hub",
-    status: "Upcoming",
-    type: "PRIVATE_FREE",
-    participants: 45,
-    revenue: 0,
-  },
-];
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import axiosInstance from "@/lib/axiosInstance";
+import Link from "next/link";
+import { toast } from "sonner";
 
 export default function MyEventsClient() {
-  const [events, setEvents] = useState(mockEvents);
+  const queryClient = useQueryClient();
+  const { data: events = [], isLoading } = useQuery({
+    queryKey: ["my-events"],
+    queryFn: async () => {
+      const { data } = await axiosInstance.get("/events");
+      return data.data;
+    },
+  });
+
+  const handleDelete = async (id: string) => {
+    if (!confirm("Are you sure you want to delete this event?")) return;
+
+    try {
+      await axiosInstance.delete(`/events/${id}`);
+      toast.success("Event deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["my-events"] });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to delete event");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -61,7 +63,13 @@ export default function MyEventsClient() {
         <CreateEventDialog />
       </div>
 
-      {events.length === 0 ? (
+      {isLoading ? (
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-[200px] bg-muted animate-pulse rounded-xl" />
+          ))}
+        </div>
+      ) : events.length === 0 ? (
         <div className="flex h-[400px] flex-col items-center justify-center rounded-xl border border-dashed p-8 text-center animate-in fade-in-50">
           <div className="mx-auto flex max-w-[420px] flex-col items-center justify-center text-center">
             <Calendar className="h-10 w-10 text-muted-foreground mb-4" />
@@ -94,10 +102,18 @@ export default function MyEventsClient() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Event</DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href={`/events/${event.id}`}>View Details</Link>
+                      </DropdownMenuItem>
+                      <EditEventDialog event={event} />
+                      <ManageParticipantsDialog eventId={event.id} eventTitle={event.title} triggerType="menuitem" />
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem className="text-destructive">Delete Event</DropdownMenuItem>
+                      <DropdownMenuItem 
+                        className="text-destructive"
+                        onClick={() => handleDelete(event.id)}
+                      >
+                        Delete Event
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -110,10 +126,10 @@ export default function MyEventsClient() {
                 <div className="flex items-center justify-between mt-4 pt-4 border-t">
                   <div className="flex items-center gap-1.5 text-sm font-medium">
                     <Users className="h-4 w-4 text-muted-foreground" />
-                    {event.participants}
+                    {event.participants?.length || 0}
                   </div>
-                  <Badge variant={event.type.includes("FREE") ? "secondary" : "default"}>
-                    {event.type.replace("_", " ")}
+                  <Badge variant={(event.eventType || "").includes("FREE") ? "secondary" : "default"}>
+                    {(event.eventType || "N/A").replace("_", " ")}
                   </Badge>
                 </div>
               </CardContent>

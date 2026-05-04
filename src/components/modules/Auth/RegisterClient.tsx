@@ -14,6 +14,7 @@ export default function RegisterClient() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [role, setRole] = useState("USER");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -25,7 +26,8 @@ export default function RegisterClient() {
         email,
         password,
         name,
-      });
+        role,
+      } as any);
 
       if (error) {
         toast.error(error.message || "Failed to register");
@@ -89,7 +91,30 @@ export default function RegisterClient() {
                 required
               />
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            
+            <div className="space-y-2 pb-2">
+              <label className="text-sm font-medium">I want to...</label>
+              <div className="grid grid-cols-2 gap-4">
+                <Button 
+                  type="button"
+                  variant={role === "USER" ? "default" : "outline"}
+                  className="rounded-xl"
+                  onClick={() => setRole("USER")}
+                >
+                  Join Events
+                </Button>
+                <Button 
+                  type="button"
+                  variant={role === "ORGANIZER" ? "default" : "outline"}
+                  className="rounded-xl"
+                  onClick={() => setRole("ORGANIZER")}
+                >
+                  Organize Events
+                </Button>
+              </div>
+            </div>
+
+            <Button type="submit" className="w-full h-12 text-base font-semibold" disabled={isLoading}>
               {isLoading ? "Creating account..." : "Sign Up"}
             </Button>
           </form>

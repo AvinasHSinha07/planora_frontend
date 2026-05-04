@@ -2,7 +2,7 @@ import axios from 'axios';
 
 const isClient = typeof window !== "undefined";
 const axiosInstance = axios.create({
-  baseURL: isClient ? '/api/v1' : (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1'),
+  baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api/v1',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

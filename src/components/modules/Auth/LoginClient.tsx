@@ -120,7 +120,7 @@ export default function LoginClient() {
                 className="text-xs hover:text-foreground"
                 disabled={isLoading}
                 onClick={() => {
-                  const creds = { email: "admin@example.com", password: "password123" };
+                  const creds = { email: "admin@planora.com", password: "admin123" };
                   setEmail(creds.email);
                   setPassword(creds.password);
                   // Trigger login manually
@@ -143,7 +143,7 @@ export default function LoginClient() {
                 className="text-xs hover:text-foreground"
                 disabled={isLoading}
                 onClick={() => {
-                  const creds = { email: "organizer@example.com", password: "password123" };
+                  const creds = { email: "organizer@planora.com", password: "organizer123" };
                   setEmail(creds.email);
                   setPassword(creds.password);
                   authClient.signIn.email({ ...creds }).then(({ data, error }) => {

@@ -3,7 +3,7 @@
 import AdminOverview from "@/components/modules/Dashboard/Admin/AdminOverview";
 import UserManagement from "@/components/modules/Dashboard/Admin/UserManagement";
 import EventManagement from "@/components/modules/Dashboard/Admin/EventManagement";
-import PaymentsClient from "@/components/modules/Dashboard/Payments/PaymentsClient";
+import RevenueDashboard from "@/components/modules/Dashboard/Analytics/RevenueDashboard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Shield, 
@@ -57,13 +57,7 @@ export default function AdminPage() {
           </TabsContent>
 
           <TabsContent value="payments" className="mt-0 focus-visible:outline-none">
-            <div className="space-y-6">
-               <div className="bg-card border rounded-xl p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-1">Global Financial Ledger</h3>
-                  <p className="text-sm text-muted-foreground">Monitor transaction status and platform revenue.</p>
-               </div>
-               <PaymentsClient />
-            </div>
+            <RevenueDashboard />
           </TabsContent>
         </div>
       </Tabs>

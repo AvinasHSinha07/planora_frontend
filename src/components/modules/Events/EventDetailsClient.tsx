@@ -25,6 +25,24 @@ import {
 } from "@/components/ui/carousel";
 import { MessageSquare } from "lucide-react";
 
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  date: string;
+  venue?: string;
+  eventLink?: string;
+  fee: number;
+  eventType: string;
+  bannerImage?: string;
+  tags?: string;
+  category?: { name: string };
+  organizer?: { name: string; avatar?: string; image?: string };
+  participants?: any[];
+  reviews?: any[];
+  relatedEvents?: any[];
+}
+
 export default function EventDetailsClient({ initialData }: { initialData: any }) {
   const { id } = useParams();
   const router = useRouter();
@@ -33,7 +51,7 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
   const [reviewComment, setReviewComment] = useState("");
   const [reviewRating, setReviewRating] = useState(5);
 
-  const { data: event, isLoading } = useQuery({
+  const { data: event, isLoading } = useQuery<Event>({
     queryKey: ["event", id],
     queryFn: async () => {
       const { data } = await axiosInstance.get(`/events/${id}`);
@@ -215,6 +233,26 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
                   {event.description}
                 </p>
               </div>
+
+              {event.tags && (
+                <div className="pt-6 space-y-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Tag className="w-4 h-4" />
+                    <span className="text-[10px] font-black uppercase tracking-widest">Discover More</span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    {event.tags.split(',').map((tag: string, idx: number) => (
+                      <Badge 
+                        key={idx} 
+                        variant="outline" 
+                        className="rounded-full px-4 py-1.5 bg-muted/50 border-primary/10 hover:border-primary/30 transition-colors text-xs font-medium cursor-default"
+                      >
+                        #{tag.trim()}
+                      </Badge>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Organizer */}
@@ -323,9 +361,9 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
                 </Card>
               )}
 
-              {event.reviews?.length > 0 ? (
+              {event?.reviews && event.reviews.length > 0 ? (
                 <div className="relative px-12">
-                   <Carousel className="w-full" opts={{ align: "start" }}>
+                   <Carousel className="w-full" opts={{ align: "start" } as any}>
                     <CarouselContent className="-ml-4">
                       {event.reviews.map((review: any) => (
                         <CarouselItem key={review.id} className="pl-4 md:basis-1/2 lg:basis-1/2">
@@ -383,7 +421,7 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
             </div>
 
             {/* Related Events Section */}
-            {event.relatedEvents?.length > 0 && (
+            {event?.relatedEvents && event.relatedEvents.length > 0 && (
               <div className="space-y-8 pt-8">
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-1 bg-primary rounded-full" />

@@ -29,6 +29,7 @@ interface EventData {
   eventType: string;
   category?: { name: string };
   bannerImage?: string;
+  tags?: string;
 }
 
 export default function EventsPageClient() {
@@ -176,9 +177,21 @@ export default function EventsPageClient() {
                 </div>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed">
+                <p className="text-sm text-muted-foreground line-clamp-3 leading-relaxed mb-4">
                   {event.description}
                 </p>
+                {event.tags && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {event.tags.split(',').slice(0, 3).map((tag, idx) => (
+                      <span key={idx} className="text-[10px] bg-muted px-2 py-0.5 rounded-full text-muted-foreground font-medium">
+                        #{tag.trim()}
+                      </span>
+                    ))}
+                    {event.tags.split(',').length > 3 && (
+                      <span className="text-[10px] text-muted-foreground/50">+{event.tags.split(',').length - 3}</span>
+                    )}
+                  </div>
+                )}
               </CardContent>
               <CardFooter className="flex justify-between items-center border-t bg-muted/5 p-6">
                 <span className="text-2xl font-bold tracking-tight">

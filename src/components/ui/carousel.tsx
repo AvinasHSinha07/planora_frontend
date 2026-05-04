@@ -4,21 +4,24 @@ import * as React from "react"
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from "embla-carousel-react"
+import { EmblaOptionsType as CarouselOptions, EmblaPluginType as CarouselPlugin } from "embla-carousel"
 import { ArrowLeft, ArrowRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 
+type CarouselApi = UseEmblaCarouselType[1]
+
 type CarouselProps = {
-  opts?: UseEmblaCarouselType[1]
-  plugins?: UseEmblaCarouselType[2]
+  opts?: CarouselOptions
+  plugins?: CarouselPlugin[]
   orientation?: "horizontal" | "vertical"
-  setApi?: (api: UseEmblaCarouselType[0]) => void
+  setApi?: (api: CarouselApi) => void
 }
 
 type CarouselContextProps = {
-  carouselRef: ReturnType<typeof useEmblaCarousel>[0]
-  api: ReturnType<typeof useEmblaCarousel>[1]
+  carouselRef: UseEmblaCarouselType[0]
+  api: CarouselApi
   scrollPrev: () => void
   scrollNext: () => void
   canScrollPrev: boolean
@@ -45,8 +48,8 @@ const Carousel = React.forwardRef<
     {
       orientation = "horizontal",
       opts,
-      setApi,
       plugins,
+      setApi,
       className,
       children,
       ...props
@@ -63,7 +66,7 @@ const Carousel = React.forwardRef<
     const [canScrollPrev, setCanScrollPrev] = React.useState(false)
     const [canScrollNext, setCanScrollNext] = React.useState(false)
 
-    const onSelect = React.useCallback((api: UseEmblaCarouselType[0]) => {
+    const onSelect = React.useCallback((api: CarouselApi) => {
       if (!api) {
         return
       }
@@ -107,7 +110,6 @@ const Carousel = React.forwardRef<
       }
 
       onSelect(api)
-      api.on("reSelect", onSelect)
       api.on("select", onSelect)
 
       return () => {
@@ -122,7 +124,7 @@ const Carousel = React.forwardRef<
           api: api,
           opts,
           orientation:
-            orientation || (opts?.axis === "y" ? "vertical" : "horizontal"),
+            orientation || ((opts as any)?.axis === "y" ? "vertical" : "horizontal"),
           scrollPrev,
           scrollNext,
           canScrollPrev,

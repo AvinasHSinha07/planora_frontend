@@ -7,6 +7,7 @@ import StatisticsSection from "@/components/modules/Home/StatisticsSection";
 import TestimonialsSection from "@/components/modules/Home/TestimonialsSection";
 import NewsletterSection from "@/components/modules/Home/NewsletterSection";
 import CTASection from "@/components/modules/Home/CTASection";
+import FAQSection from "@/components/modules/Home/FAQSection";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
 
@@ -50,6 +51,7 @@ export default function HomePage() {
 
       <StatisticsSection />
       <TestimonialsSection />
+      <FAQSection />
       <NewsletterSection />
       <CTASection />
     </>

@@ -12,7 +12,8 @@ import {
   Bell,
   PieChart,
   UserCheck,
-  ShieldAlert
+  ShieldAlert,
+  CreditCard
 } from "lucide-react";
 import { authClient } from "@/lib/auth-client";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +26,7 @@ const sidebarLinks = [
   { href: "/dashboard/participants", label: "Participants", icon: UserCheck },
   { href: "/dashboard/reviews", label: "Reviews", icon: MessageSquare },
   { href: "/dashboard/notifications", label: "Notifications", icon: Bell },
+  { href: "/dashboard/payments", label: "Payments", icon: CreditCard },
   { href: "/dashboard/analytics", label: "Analytics", icon: PieChart },
   { href: "/dashboard/admin", label: "Admin Console", icon: ShieldAlert },
   { href: "/dashboard/settings", label: "Settings", icon: Settings },
@@ -48,7 +50,8 @@ export default function DashboardSidebar() {
       "/dashboard/notifications", 
       "/dashboard/settings", 
       "/dashboard/invitations",
-      "/dashboard/participations"
+      "/dashboard/participations",
+      "/dashboard/payments"
     ];
     return userOnlyLinks.includes(link.href);
   });

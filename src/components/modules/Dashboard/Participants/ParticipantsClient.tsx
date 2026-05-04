@@ -100,14 +100,22 @@ export default function ParticipantsClient() {
                 </TableCell>
                 <TableCell className="py-4">
                   <div className="flex -space-x-2 overflow-hidden">
-                    {[1, 2, 3].map((i) => (
-                      <Avatar key={i} className="inline-block border-2 border-background w-8 h-8 shadow-sm">
-                        <AvatarFallback className="text-[10px] bg-primary/10 text-primary">U</AvatarFallback>
+                    {(event.participants || []).slice(0, 3).map((participant: any) => (
+                      <Avatar key={participant.id} className="inline-block border-2 border-background w-8 h-8 shadow-sm">
+                        <AvatarImage src={participant.user?.image || participant.user?.avatar} />
+                        <AvatarFallback className="text-[10px] bg-primary/10 text-primary">
+                          {participant.user?.name?.charAt(0) || "U"}
+                        </AvatarFallback>
                       </Avatar>
                     ))}
-                    <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-[10px] font-bold border-2 border-background text-muted-foreground">
-                       +{(event.participants?.length || 0)}
-                    </div>
+                    {(event.participants?.length || 0) > 3 && (
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-muted text-[10px] font-bold border-2 border-background text-muted-foreground">
+                         +{(event.participants.length - 3)}
+                      </div>
+                    )}
+                    {event.participants?.length === 0 && (
+                      <span className="text-xs text-muted-foreground">0 Participants</span>
+                    )}
                   </div>
                 </TableCell>
                 <TableCell className="py-4">

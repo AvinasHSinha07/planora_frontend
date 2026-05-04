@@ -1,20 +1,28 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useParams } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import Link from "next/link";
-import { Calendar, MapPin, Users, Info, ShieldCheck, Clock, Share2, Heart, Tag, User, Star } from "lucide-react";
+import { Calendar, MapPin, Users, Info, ShieldCheck, Clock, Share2, Heart, Tag, User, Star, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { authClient } from "@/lib/auth-client";
+import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 export default function EventDetailsClient() {
   const { id } = useParams();
+  const queryClient = useQueryClient();
+  const { data: session } = authClient.useSession();
+  const [reviewComment, setReviewComment] = useState("");
+  const [reviewRating, setReviewRating] = useState(5);
+  const [isSubmittingReview, setIsSubmittingReview] = useState(false);
 
   const { data: event, isLoading } = useQuery({
     queryKey: ["event", id],
@@ -23,6 +31,30 @@ export default function EventDetailsClient() {
       return data.data;
     },
   });
+
+  const isParticipant = event?.participants?.some((p: any) => p.userId === session?.user?.id && p.status === "APPROVED");
+  const hasAlreadyReviewed = event?.reviews?.some((r: any) => r.userId === session?.user?.id);
+
+  const handleSubmitReview = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reviewComment) return;
+    setIsSubmittingReview(true);
+    try {
+      await axiosInstance.post("/reviews", {
+        eventId: event.id,
+        rating: reviewRating,
+        comment: reviewComment
+      });
+      toast.success("Review submitted successfully!");
+      setReviewComment("");
+      setReviewRating(5);
+      queryClient.invalidateQueries({ queryKey: ["event", event.id] });
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to submit review");
+    } finally {
+      setIsSubmittingReview(false);
+    }
+  };
 
   const averageRating = event?.reviews?.length 
     ? (event.reviews.reduce((acc: number, rev: any) => acc + rev.rating, 0) / event.reviews.length).toFixed(1)
@@ -144,7 +176,7 @@ export default function EventDetailsClient() {
               <CardContent className="p-8">
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <Avatar className="w-20 h-20 border-4 border-background ring-2 ring-primary/20">
-                    <AvatarImage src={event.organizer?.avatar} />
+                    <AvatarImage src={event.organizer?.image || event.organizer?.avatar} />
                     <AvatarFallback className="bg-primary text-primary-foreground text-xl">
                       {event.organizer?.name?.charAt(0) || "U"}
                     </AvatarFallback>
@@ -182,6 +214,61 @@ export default function EventDetailsClient() {
                 </div>
               </div>
 
+              {/* Review Submission Form */}
+              {isParticipant && !hasAlreadyReviewed && (
+                <Card className="rounded-3xl border-primary/20 bg-primary/5 shadow-inner">
+                  <CardContent className="p-8 space-y-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-primary-foreground">
+                        <Star className="w-5 h-5 fill-current" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold">Leave a Review</h3>
+                        <p className="text-sm text-muted-foreground">Share your experience with other attendees.</p>
+                      </div>
+                    </div>
+                    
+                    <form onSubmit={handleSubmitReview} className="space-y-6">
+                      <div className="space-y-3">
+                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Rating</p>
+                        <div className="flex gap-2">
+                          {[1, 2, 3, 4, 5].map((star) => (
+                            <button
+                              key={star}
+                              type="button"
+                              onClick={() => setReviewRating(star)}
+                              className="focus:outline-none transition-transform active:scale-90"
+                            >
+                              <Star 
+                                className={`w-8 h-8 ${star <= reviewRating ? "fill-amber-500 text-amber-500" : "text-muted/30"}`} 
+                              />
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-3">
+                        <p className="text-sm font-bold uppercase tracking-widest text-muted-foreground">Your Thoughts</p>
+                        <Textarea 
+                          placeholder="What did you like about this event? How was the organization?"
+                          className="min-h-[120px] rounded-2xl bg-background border-primary/10 focus:border-primary/30 transition-all text-lg"
+                          value={reviewComment}
+                          onChange={(e) => setReviewComment(e.target.value)}
+                        />
+                      </div>
+
+                      <Button 
+                        type="submit" 
+                        className="w-full h-14 rounded-2xl text-lg font-bold shadow-lg shadow-primary/20"
+                        disabled={isSubmittingReview || !reviewComment}
+                      >
+                        {isSubmittingReview ? <Loader2 className="w-5 h-5 animate-spin mr-2" /> : "Post Review"}
+                      </Button>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+
               {event.reviews?.length > 0 ? (
                 <div className="grid gap-6">
                   {event.reviews.map((review: any) => (
@@ -190,7 +277,7 @@ export default function EventDetailsClient() {
                         <div className="flex justify-between items-start">
                           <div className="flex items-center gap-3">
                             <Avatar className="w-10 h-10">
-                              <AvatarImage src={review.user?.avatar} />
+                              <AvatarImage src={review.user?.image || review.user?.avatar} />
                               <AvatarFallback>{review.user?.name?.charAt(0)}</AvatarFallback>
                             </Avatar>
                             <div>

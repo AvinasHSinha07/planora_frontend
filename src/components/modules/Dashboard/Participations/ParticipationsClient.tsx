@@ -102,7 +102,7 @@ export default function ParticipationsClient() {
             <div className="pt-4 border-t border-border/30 flex items-center justify-between">
                <div className="flex items-center gap-2">
                   <Avatar className="w-6 h-6">
-                     <AvatarImage src={p.event.organizer.avatar} />
+                     <AvatarImage src={p.event.organizer.image || p.event.organizer.avatar} />
                      <AvatarFallback>{p.event.organizer.name.charAt(0)}</AvatarFallback>
                   </Avatar>
                   <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">

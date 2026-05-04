@@ -185,7 +185,7 @@ export default function ManageParticipantsDialog({
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12 border-2 border-background shadow-sm">
-                        <AvatarImage src={participant.user.avatar} />
+                        <AvatarImage src={participant.user.image || participant.user.avatar} />
                         <AvatarFallback className="bg-primary/5 text-primary">{participant.user.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>
@@ -262,7 +262,7 @@ export default function ManageParticipantsDialog({
                   >
                     <div className="flex items-center gap-4">
                       <Avatar className="w-12 h-12 border-2 border-background shadow-sm">
-                        <AvatarImage src={invitation.invitee.avatar} />
+                        <AvatarImage src={invitation.invitee.image || invitation.invitee.avatar} />
                         <AvatarFallback className="bg-primary/5 text-primary">{invitation.invitee.name.charAt(0)}</AvatarFallback>
                       </Avatar>
                       <div>

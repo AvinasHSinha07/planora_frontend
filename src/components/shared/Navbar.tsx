@@ -5,13 +5,17 @@ import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
 import { ThemeToggle } from "./ThemeToggle";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Navbar() {
   const { data: session, isPending } = authClient.useSession();
   const router = useRouter();
+  const queryClient = useQueryClient();
 
   const handleLogout = async () => {
     await authClient.signOut();
+    
+    queryClient.clear();
     router.push("/");
     router.refresh();
   };

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import QueryProvider from "@/providers/QueryProvider";
 import LenisProvider from "@/providers/LenisProvider";
-import { ThemeProvider as NextThemesProvider } from "next-themes";
+import { ThemeProvider } from "@/providers/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
 import Navbar from "@/components/shared/Navbar";
 import Footer from "@/components/shared/Footer";
@@ -29,7 +29,7 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="flex flex-col font-sans min-h-screen" suppressHydrationWarning>
-        <NextThemesProvider
+        <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
@@ -48,7 +48,7 @@ export default function RootLayout({
             <Toaster position="top-center" richColors />
             <PlanoraBot />
           </QueryProvider>
-        </NextThemesProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

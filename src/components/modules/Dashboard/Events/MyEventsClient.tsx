@@ -82,7 +82,7 @@ export default function MyEventsClient() {
         </div>
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {events.map((event) => (
+          {events.map((event: any) => (
             <Card key={event.id} className="flex flex-col overflow-hidden transition-all hover:shadow-md">
               <CardHeader className="pb-4">
                 <div className="flex justify-between items-start">

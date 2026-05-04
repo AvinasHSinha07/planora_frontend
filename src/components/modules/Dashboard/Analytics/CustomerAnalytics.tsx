@@ -244,10 +244,4 @@ export default function CustomerAnalytics() {
   );
 }
 
-function Link({ href, children, className, ...props }: any) {
-  return (
-    <a href={href} className={className} {...props}>
-      {children}
-    </a>
-  );
-}
+

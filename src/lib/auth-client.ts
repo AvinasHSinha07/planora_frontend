@@ -7,7 +7,7 @@ const isProduction = process.env.NODE_ENV === "production";
 // In development, we use the NEXT_PUBLIC_API_URL (localhost:5000)
 const rawURL = isProduction && isClient 
     ? window.location.origin 
-    : (process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000");
+    : (process.env.NEXT_PUBLIC_API_URL?.replace("/api/v1", "") || "http://localhost:5000");
 
 // Ensure baseURL doesn't include the api path twice
 const baseURL = rawURL.replace(/\/api\/v1\/?$/, "");

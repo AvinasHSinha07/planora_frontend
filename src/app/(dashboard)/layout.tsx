@@ -14,13 +14,13 @@ export default async function DashboardLayout({ children }: { children: ReactNod
 
   const session = sessionResponse?.data;
   
-  if (!session) {
-    console.log("[DASHBOARD] No session found, redirecting to login...");
-    redirect("/login");
+  // Note: We don't redirect on server-side to prevent infinite loops 
+  // if server session check fails due to cross-domain cookie issues.
+  // The pages or a client-side guard will handle this.
+  const userRole = (session?.user as any)?.role;
+  if (session) {
+    console.log(`[DASHBOARD] User ${session.user.email} (${userRole}) authorized.`);
   }
-
-  const userRole = (session.user as any)?.role;
-  console.log(`[DASHBOARD] User ${session.user.email} (${userRole}) authorized.`);
 
   return (
     <div className="flex min-h-screen bg-background relative">

@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const isProduction = process.env.NODE_ENV === "production";
   const cookieName = isProduction ? '__Secure-better-auth.session_token' : 'better-auth.session_token';
   const sessionToken = request.cookies.get(cookieName)?.value || request.cookies.get('better-auth.session_token')?.value;

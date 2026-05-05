@@ -80,6 +80,7 @@ export default function FeaturedEvents({ initialData }: { initialData: any }) {
                         alt={event.title}
                         fill
                         priority={index < 2}
+                        unoptimized={event.bannerImage?.includes("ellaslist.com.au")}
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -92,7 +93,7 @@ export default function FeaturedEvents({ initialData }: { initialData: any }) {
                         <div className="flex items-center gap-4 text-white text-xs font-bold uppercase tracking-tighter">
                            <div className="flex items-center gap-1">
                               <Calendar className="w-3 h-3" />
-                              {new Date(event.date).toLocaleDateString()}
+                              {new Date(event.date).toLocaleDateString('en-US')}
                            </div>
                            <div className="flex items-center gap-1">
                               <MapPin className="w-3 h-3" />

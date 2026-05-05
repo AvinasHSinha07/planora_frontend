@@ -1,26 +1,45 @@
-import { ReactNode } from "react";
-import { redirect } from "next/navigation";
-import { headers } from "next/headers";
+"use client";
+
+import { ReactNode, useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import DashboardSidebar from "@/components/modules/Dashboard/DashboardSidebar";
 import { authClient } from "@/lib/auth-client";
+import { Loader2 } from "lucide-react";
 
-export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  // Server-side session check
-  const sessionResponse = await authClient.getSession({
-    fetchOptions: {
-      headers: await headers()
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const router = useRouter();
+  const { data: session, isPending } = authClient.useSession();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isPending && !session && mounted) {
+      console.log("[DASHBOARD] No session found, redirecting to login...");
+      router.push("/login");
     }
-  });
+  }, [session, isPending, mounted, router]);
 
-  const session = sessionResponse?.data;
-  
-  // Note: We don't redirect on server-side to prevent infinite loops 
-  // if server session check fails due to cross-domain cookie issues.
-  // The pages or a client-side guard will handle this.
-  const userRole = (session?.user as any)?.role;
-  if (session) {
-    console.log(`[DASHBOARD] User ${session.user.email} (${userRole}) authorized.`);
+  if (!mounted || isPending) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-10 w-10 animate-spin text-primary" />
+          <p className="text-sm font-medium animate-pulse text-muted-foreground">Synchronizing Planora Environment...</p>
+        </div>
+      </div>
+    );
   }
+
+  // If we're not loading and there's no session, we don't render anything 
+  // while the useEffect handles the redirect.
+  if (!session) {
+    return null;
+  }
+
+  const userRole = (session.user as any)?.role || "USER";
 
   return (
     <div className="flex min-h-screen bg-background relative">

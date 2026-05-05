@@ -14,6 +14,11 @@ export default function LoginClient() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = authClient.useSession();
+
+  if (session) {
+    router.push("/dashboard");
+  }
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,7 +48,7 @@ export default function LoginClient() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${window.location.origin}/dashboard`
+        callbackURL: "/dashboard"
       });
     } catch (error: any) {
       toast.error("Google login failed");

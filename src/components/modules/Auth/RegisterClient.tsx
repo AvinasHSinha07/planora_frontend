@@ -16,6 +16,11 @@ export default function RegisterClient() {
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("USER");
   const [isLoading, setIsLoading] = useState(false);
+  const { data: session } = authClient.useSession();
+
+  if (session) {
+    router.push("/dashboard");
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,7 +51,7 @@ export default function RegisterClient() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: `${window.location.origin}/dashboard`
+        callbackURL: "/dashboard"
       });
     } catch (error: any) {
       toast.error("Google registration failed");

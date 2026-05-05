@@ -204,6 +204,15 @@ export default function PaymentsClient() {
             </CardTitle>
          </CardHeader>
          <CardContent className="p-0">
+      {/* Table - Desktop only */}
+      <Card className="rounded-[2.5rem] sm:rounded-[3rem] overflow-hidden border-border/40 shadow-2xl bg-card hidden md:block">
+         <CardHeader className="border-b bg-muted/30 px-8 py-6">
+            <CardTitle className="text-xl font-black uppercase tracking-tight flex items-center gap-3 italic">
+               <CreditCard className="w-5 h-5 text-primary" />
+               {userRole === "USER" ? "Purchase History" : "Revenue Streams"}
+            </CardTitle>
+         </CardHeader>
+         <CardContent className="p-0">
             <Table>
                <TableHeader>
                   <TableRow className="hover:bg-transparent border-none">
@@ -266,15 +275,66 @@ export default function PaymentsClient() {
                         </TableCell>
                      </TableRow>
                   ))}
-                  {filteredPayments.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={userRole === "USER" ? 5 : 6} className="h-48 text-center text-muted-foreground italic">
-                        No financial records found in this vault.
-                      </TableCell>
-                    </TableRow>
-                  )}
                </TableBody>
             </Table>
+         </CardContent>
+      </Card>
+
+      {/* Mobile - Card List View */}
+      <div className="md:hidden space-y-4">
+         {filteredPayments.map((p: any) => (
+            <Card key={p.id} className="rounded-3xl border-border/40 overflow-hidden shadow-lg bg-card">
+               <CardContent className="p-5 space-y-4">
+                  <div className="flex justify-between items-start">
+                     <div className="flex items-center gap-3">
+                        <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-black uppercase text-xs">
+                           {p.event.title.charAt(0)}
+                        </div>
+                        <div>
+                           <p className="font-bold text-sm tracking-tight line-clamp-1">{p.event.title}</p>
+                           <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">{p.event.category?.name}</p>
+                        </div>
+                     </div>
+                     <p className="font-black text-lg">${p.amount.toFixed(2)}</p>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-border/10">
+                     <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-bold italic">
+                        <Calendar className="w-3 h-3" />
+                        {format(new Date(p.createdAt), "MMM d, yyyy")}
+                     </div>
+                     {getStatusBadge(p.status)}
+                  </div>
+
+                  {(userRole === "ORGANIZER" || userRole === "ADMIN") && (
+                     <div className="flex items-center gap-3 bg-muted/30 p-3 rounded-2xl">
+                        <Avatar className="w-8 h-8 border">
+                           <AvatarImage src={p.user?.image || p.user?.avatar} />
+                           <AvatarFallback>{p.user?.name?.charAt(0) || "U"}</AvatarFallback>
+                        </Avatar>
+                        <div>
+                           <p className="text-xs font-bold tracking-tight">{p.user?.name || "Private User"}</p>
+                           <p className="text-[9px] text-muted-foreground line-clamp-1">{p.user?.email}</p>
+                        </div>
+                     </div>
+                  )}
+
+                  <div className="flex justify-between items-center bg-muted/10 p-2 rounded-xl border border-dashed">
+                     <span className="text-[9px] font-black uppercase tracking-widest text-muted-foreground opacity-60">ID</span>
+                     <code className="text-[9px] text-muted-foreground font-mono">
+                        {p.stripeSessionId?.substring(0, 12)}...
+                     </code>
+                  </div>
+               </CardContent>
+            </Card>
+         ))}
+      </div>
+
+      {filteredPayments.length === 0 && (
+         <div className="md:hidden h-48 flex flex-col items-center justify-center text-muted-foreground italic bg-muted/20 rounded-3xl border border-dashed">
+            <p>No financial records found in this vault.</p>
+         </div>
+      )}
          </CardContent>
       </Card>
     </div>

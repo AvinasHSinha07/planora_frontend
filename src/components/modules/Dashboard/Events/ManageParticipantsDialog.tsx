@@ -31,6 +31,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -115,33 +116,33 @@ export default function ManageParticipantsDialog({
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[700px] max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-[2rem]">
-        <DialogHeader className="p-8 pb-0">
-          <div className="flex justify-between items-start">
+      <DialogContent className="w-[95vw] sm:max-w-[700px] max-h-[90vh] flex flex-col p-0 overflow-hidden rounded-[1.5rem] sm:rounded-[2.5rem] border-none shadow-3xl">
+        <DialogHeader className="p-6 sm:p-10 pb-0">
+          <div className="flex flex-col sm:flex-row justify-between items-start gap-4">
              <div>
-                <DialogTitle className="flex items-center gap-2 text-2xl font-bold">
-                  <Users className="w-6 h-6 text-primary" />
-                  Management Hub
+                <DialogTitle className="flex items-center gap-2 text-xl sm:text-2xl font-black uppercase italic tracking-tight">
+                   <Users className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
+                   Management Hub
                 </DialogTitle>
-                <DialogDescription className="mt-2">
-                  Control access and invitations for <span className="text-foreground font-bold font-mono">"{eventTitle}"</span>
+                <DialogDescription className="mt-2 text-xs sm:text-sm italic">
+                   Control access and invitations for <span className="text-foreground font-black font-mono">"{eventTitle}"</span>
                 </DialogDescription>
              </div>
           </div>
         </DialogHeader>
 
-        <div className="px-8 mt-6">
-           <form onSubmit={handleInvite} className="flex gap-2 p-2 bg-muted/30 rounded-2xl border border-border/50">
+        <div className="px-6 sm:px-10 mt-6">
+           <form onSubmit={handleInvite} className="flex flex-col sm:flex-row gap-2 p-2 bg-muted/30 rounded-2xl border border-border/50">
               <div className="relative flex-1">
                  <MailPlus className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                  <Input 
                    placeholder="Invite someone by email..." 
-                   className="bg-transparent border-none shadow-none focus-visible:ring-0 pl-10"
+                   className="bg-transparent border-none shadow-none focus-visible:ring-0 pl-10 h-10 sm:h-12 text-sm"
                    value={inviteEmail}
                    onChange={(e) => setInviteEmail(e.target.value)}
                  />
               </div>
-              <Button type="submit" disabled={isInviting || !inviteEmail} className="rounded-xl px-6 gap-2">
+              <Button type="submit" disabled={isInviting || !inviteEmail} className="rounded-xl px-6 h-10 sm:h-12 gap-2 w-full sm:w-auto font-bold uppercase tracking-widest text-[10px]">
                  {isInviting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
                  Invite
               </Button>
@@ -181,24 +182,24 @@ export default function ManageParticipantsDialog({
                 participants.map((participant: any) => (
                   <div 
                     key={participant.id} 
-                    className="flex items-center justify-between p-4 bg-muted/20 border border-border/30 rounded-2xl hover:border-primary/20 transition-all duration-300"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 sm:p-5 bg-muted/20 border border-border/30 rounded-2xl hover:border-primary/20 transition-all duration-300 gap-4"
                   >
                     <div className="flex items-center gap-4">
-                      <Avatar className="w-12 h-12 border-2 border-background shadow-sm">
+                      <Avatar className="w-12 h-12 border-2 border-background shadow-xl">
                         <AvatarImage src={participant.user.image || participant.user.avatar} />
-                        <AvatarFallback className="bg-primary/5 text-primary">{participant.user.name.charAt(0)}</AvatarFallback>
+                        <AvatarFallback className="bg-primary/5 text-primary font-black">{participant.user.name.charAt(0)}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <p className="font-bold">{participant.user.name}</p>
-                        <p className="text-xs text-muted-foreground italic">{participant.user.email}</p>
+                      <div className="min-w-0">
+                        <p className="font-black text-sm uppercase italic truncate">{participant.user.name}</p>
+                        <p className="text-[10px] text-muted-foreground italic truncate">{participant.user.email}</p>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center justify-between sm:justify-end gap-3 pt-3 sm:pt-0 border-t sm:border-none border-border/10">
                       <Badge 
                         variant="outline" 
                         className={`
-                          px-3 py-1 rounded-full border-none
+                          px-3 py-1 rounded-full border-none font-black text-[9px] uppercase tracking-widest
                           ${participant.status === "APPROVED" ? "bg-emerald-500/10 text-emerald-600" : ""}
                           ${participant.status === "PENDING" ? "bg-amber-500/10 text-amber-600" : ""}
                           ${participant.status === "REJECTED" ? "bg-destructive/10 text-destructive" : ""}
@@ -210,31 +211,32 @@ export default function ManageParticipantsDialog({
 
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" size="icon" className="rounded-full hover:bg-muted/50">
+                          <Button variant="ghost" size="icon" className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors">
                             <MoreVertical className="w-4 h-4" />
                           </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-border/50 shadow-2xl">
+                        <DropdownMenuContent align="end" className="w-56 rounded-2xl p-2 border-none shadow-3xl bg-card">
+                          <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-3 py-2">Lifecycle Management</DropdownMenuLabel>
                           {participant.status === "PENDING" && (
                             <>
-                              <DropdownMenuItem onClick={() => updateStatus(participant.id, "APPROVED")} className="rounded-xl py-2 cursor-pointer text-emerald-600 focus:bg-emerald-50">
+                              <DropdownMenuItem onClick={() => updateStatus(participant.id, "APPROVED")} className="rounded-xl py-2 cursor-pointer text-emerald-600 focus:bg-emerald-50 font-bold">
                                 <Check className="w-4 h-4 mr-2" /> Approve Request
                               </DropdownMenuItem>
-                              <DropdownMenuItem onClick={() => updateStatus(participant.id, "REJECTED")} className="rounded-xl py-2 cursor-pointer text-amber-600 focus:bg-amber-50">
+                              <DropdownMenuItem onClick={() => updateStatus(participant.id, "REJECTED")} className="rounded-xl py-2 cursor-pointer text-amber-600 focus:bg-amber-50 font-bold">
                                 <X className="w-4 h-4 mr-2" /> Reject Request
                               </DropdownMenuItem>
                             </>
                           )}
                           {participant.status === "APPROVED" && (
-                            <DropdownMenuItem onClick={() => updateStatus(participant.id, "REJECTED")} className="rounded-xl py-2 cursor-pointer text-amber-600 focus:bg-amber-50">
+                            <DropdownMenuItem onClick={() => updateStatus(participant.id, "REJECTED")} className="rounded-xl py-2 cursor-pointer text-amber-600 focus:bg-amber-50 font-bold">
                               <X className="w-4 h-4 mr-2" /> Revoke Access
                             </DropdownMenuItem>
                           )}
-                          <DropdownMenuItem onClick={() => updateStatus(participant.id, "BANNED")} className="rounded-xl py-2 cursor-pointer text-destructive font-bold focus:bg-destructive/5">
-                            <Ban className="w-4 h-4 mr-2" /> Ban from Event
+                          <DropdownMenuItem onClick={() => updateStatus(participant.id, "BANNED")} className="rounded-xl py-2 cursor-pointer text-destructive font-black focus:bg-destructive/5">
+                            <Ban className="w-4 h-4 mr-2" /> Ban Identity
                           </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => removeParticipant(participant.id)} className="rounded-xl py-2 cursor-pointer text-destructive focus:bg-destructive/5">
-                            <Trash2 className="w-4 h-4 mr-2" /> Remove Permanent
+                          <DropdownMenuItem onClick={() => removeParticipant(participant.id)} className="rounded-xl py-2 cursor-pointer text-destructive focus:bg-destructive/5 font-bold">
+                            <Trash2 className="w-4 h-4 mr-2" /> Permanent Purge
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

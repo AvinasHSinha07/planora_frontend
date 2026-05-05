@@ -89,22 +89,22 @@ export default function ParticipationsClient() {
       {participations.map((p: any) => (
         <Card key={p.id} className="overflow-hidden rounded-[2rem] border-border/50 hover:shadow-2xl transition-all duration-500 flex flex-col group">
           <CardHeader className="p-0">
-             <div className="relative h-40 w-full overflow-hidden">
+             <div className="relative h-32 sm:h-40 w-full overflow-hidden">
                 <Image 
                    src={p.event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=1000&auto=format&fit=crop"} 
                    className="object-cover group-hover:scale-110 transition-transform duration-700"
                    alt={p.event.title}
                    fill
                 />
-                <div className="absolute top-4 left-4">
-                   <Badge variant="secondary" className="bg-background/80 backdrop-blur-md text-foreground border-none">
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4">
+                   <Badge variant="secondary" className="bg-background/80 backdrop-blur-md text-foreground border-none text-[10px] sm:text-xs">
                       {p.event.category?.name}
                    </Badge>
                 </div>
-                <div className="absolute top-4 right-4">
+                <div className="absolute top-3 right-3 sm:top-4 sm:right-4">
                    <Badge 
                       className={`
-                        shadow-lg backdrop-blur-md border-none px-3 py-1 gap-2
+                        shadow-lg backdrop-blur-md border-none px-2 sm:px-3 py-1 gap-1 sm:gap-2 text-[10px] sm:text-xs
                         ${p.status === "APPROVED" ? "bg-emerald-500/90 text-white" : ""}
                         ${p.status === "PENDING" ? "bg-amber-500/90 text-white" : ""}
                         ${p.status === "REJECTED" ? "bg-destructive/90 text-white" : ""}
@@ -112,46 +112,47 @@ export default function ParticipationsClient() {
                       `}
                     >
                       {getStatusIcon(p.status)}
-                      {p.status}
+                      <span className="hidden xs:inline">{p.status}</span>
+                      <span className="xs:hidden">{p.status.charAt(0)}</span>
                     </Badge>
                 </div>
              </div>
           </CardHeader>
           
-          <CardContent className="p-6 space-y-4 flex-1">
-            <CardTitle className="text-xl line-clamp-1 group-hover:text-primary transition-colors">{p.event.title}</CardTitle>
+          <CardContent className="p-4 sm:p-6 space-y-4 flex-1">
+            <CardTitle className="text-lg sm:text-xl line-clamp-1 group-hover:text-primary transition-colors">{p.event.title}</CardTitle>
             
-            <div className="space-y-2 text-sm text-muted-foreground">
+            <div className="space-y-2 text-xs sm:text-sm text-muted-foreground">
               <div className="flex items-center gap-2">
-                <Calendar className="w-4 h-4 text-primary" />
+                <Calendar className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
                 {format(new Date(p.event.date), "MMM d, yyyy • h:mm a")}
               </div>
               <div className="flex items-center gap-2">
-                <MapPin className="w-4 h-4 text-primary" />
-                {p.event.venue || "Online"}
+                <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-primary" />
+                <span className="line-clamp-1">{p.event.venue || "Online"}</span>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-border/30 flex items-center justify-between">
+            <div className="pt-3 sm:pt-4 border-t border-border/30 flex items-center justify-between">
                <div className="flex items-center gap-2">
-                  <Avatar className="w-6 h-6">
+                  <Avatar className="w-5 h-5 sm:w-6 sm:h-6">
                      <AvatarImage src={p.event.organizer.image || p.event.organizer.avatar} />
                      <AvatarFallback>{p.event.organizer.name.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">
-                     Hosted by {p.event.organizer.name}
+                  <span className="text-[9px] sm:text-[10px] text-muted-foreground uppercase font-bold tracking-widest line-clamp-1">
+                     {p.event.organizer.name}
                   </span>
                </div>
                {p.event.fee > 0 && (
-                 <Badge variant="outline" className="text-emerald-600 font-mono">
+                 <Badge variant="outline" className="text-emerald-600 font-mono text-[10px] sm:text-xs">
                     ${p.event.fee}
                  </Badge>
                )}
             </div>
           </CardContent>
 
-          <CardFooter className="p-6 pt-0">
-            <Button asChild className="w-full rounded-2xl gap-2" variant={p.status === "APPROVED" ? "default" : "secondary"}>
+          <CardFooter className="p-4 sm:p-6 pt-0">
+            <Button asChild className="w-full rounded-xl sm:rounded-2xl gap-2 h-11 sm:h-12" variant={p.status === "APPROVED" ? "default" : "secondary"}>
                <Link href={`/events/${p.event.id}`}>
                   {p.status === "APPROVED" ? "View Event Page" : "View Details"}
                </Link>

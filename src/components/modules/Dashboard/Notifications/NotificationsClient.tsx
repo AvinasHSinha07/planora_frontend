@@ -93,20 +93,20 @@ export default function NotificationsClient() {
   return (
     <div className="max-w-4xl space-y-10 pb-24">
       {/* Header Actions */}
-      <div className="flex items-center justify-between bg-card/50 backdrop-blur-xl border p-6 rounded-[2.5rem] shadow-sm">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-card/50 backdrop-blur-xl border p-4 sm:p-6 rounded-[1.5rem] sm:rounded-[2.5rem] shadow-sm">
          <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-               <Bell className="w-6 h-6" />
+            <div className="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-primary/10 flex items-center justify-center text-primary shrink-0">
+               <Bell className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-               <h2 className="text-xl font-bold">Activity Center</h2>
-               <p className="text-sm text-muted-foreground font-medium">You have {unreadCount} unread updates</p>
+               <h2 className="text-lg sm:text-xl font-bold">Activity Center</h2>
+               <p className="text-xs sm:text-sm text-muted-foreground font-medium">You have {unreadCount} unread updates</p>
             </div>
          </div>
          {unreadCount > 0 && (
            <Button 
              variant="outline" 
-             className="rounded-2xl gap-2 font-bold h-12 px-6 border-primary/20 text-primary hover:bg-primary/5"
+             className="w-full sm:w-auto rounded-xl sm:rounded-2xl gap-2 font-bold h-11 sm:h-12 px-6 border-primary/20 text-primary hover:bg-primary/5"
              onClick={() => markAllAsReadMutation.mutate()}
              disabled={markAllAsReadMutation.isPending}
            >
@@ -129,29 +129,29 @@ export default function NotificationsClient() {
                 <Card 
                   key={n.id} 
                   className={`
-                    rounded-[2rem] border-border/40 transition-all duration-500 group relative overflow-hidden
+                    rounded-[1.5rem] sm:rounded-[2rem] border-border/40 transition-all duration-500 group relative overflow-hidden
                     ${n.isRead ? "bg-muted/10 opacity-75 grayscale-[0.5]" : "bg-card shadow-lg hover:shadow-2xl border-l-8 border-l-primary"}
                   `}
                 >
-                  <CardContent className="p-6">
-                    <div className="flex gap-6 items-center">
+                  <CardContent className="p-4 sm:p-6">
+                    <div className="flex gap-4 sm:gap-6 items-start sm:items-center">
                        <div className={`
-                         h-14 w-14 shrink-0 rounded-2xl flex items-center justify-center transition-all duration-500
+                         h-12 w-12 sm:h-14 sm:w-14 shrink-0 rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-500
                          ${n.isRead ? "bg-muted text-muted-foreground" : "bg-primary/10 text-primary group-hover:scale-110 group-hover:rotate-6"}
                        `}>
                           {getIcon(n.title)}
                        </div>
                        
-                       <div className="flex-1 space-y-1">
-                          <div className="flex justify-between items-start">
-                             <h4 className={`font-black text-lg tracking-tight ${n.isRead ? "text-muted-foreground" : "text-foreground"}`}>
+                       <div className="flex-1 space-y-1 min-w-0">
+                          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 sm:gap-4">
+                             <h4 className={`font-black text-base sm:text-lg tracking-tight line-clamp-2 ${n.isRead ? "text-muted-foreground" : "text-foreground"}`}>
                                 {n.title}
                              </h4>
-                             <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">
+                             <span className="text-[9px] sm:text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 shrink-0">
                                 {format(new Date(n.createdAt), "h:mm a")}
                              </span>
                           </div>
-                          <p className="text-muted-foreground leading-relaxed">
+                          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-3 sm:line-clamp-none">
                              {n.message}
                           </p>
                        </div>
@@ -160,7 +160,7 @@ export default function NotificationsClient() {
                          <Button 
                            variant="ghost" 
                            size="icon" 
-                           className="h-10 w-10 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:bg-primary/10 hover:text-primary"
+                           className="h-9 w-9 sm:h-10 sm:w-10 rounded-full sm:opacity-0 group-hover:opacity-100 transition-all hover:bg-primary/10 hover:text-primary shrink-0"
                            onClick={() => markAsReadMutation.mutate(n.id)}
                            disabled={markAsReadMutation.isPending}
                          >

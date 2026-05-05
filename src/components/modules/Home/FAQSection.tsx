@@ -36,15 +36,15 @@ export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0);
 
   return (
-    <section className="py-24 bg-background">
+    <section className="py-16 md:py-24 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto">
           {/* Header */}
-          <div className="text-center mb-16 space-y-4">
-            <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">
+          <div className="text-center mb-12 md:mb-16 space-y-4">
+            <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight px-4">
               Frequently Asked <span className="text-primary">Questions</span>
             </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-base md:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
               Have questions? We&apos;ve got answers. Find information about hosting, payments, and platform features.
             </p>
           </div>
@@ -58,20 +58,20 @@ export default function FAQSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="rounded-2xl border bg-card text-card-foreground shadow-sm overflow-hidden transition-all duration-300"
+                className="rounded-2xl md:rounded-3xl border bg-card text-card-foreground shadow-sm overflow-hidden transition-all duration-300"
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full text-left p-6 flex items-center justify-between gap-4 hover:bg-muted/50 transition-colors"
+                  className="w-full text-left p-5 md:p-6 flex items-center justify-between gap-4 hover:bg-muted/50 transition-colors"
                 >
-                  <h3 className="text-lg md:text-xl font-bold">
+                  <h3 className="text-base md:text-xl font-bold leading-tight">
                     {faq.question}
                   </h3>
                   <div className={cn(
-                    "flex-shrink-0 w-10 h-10 rounded-full border flex items-center justify-center transition-transform duration-300",
+                    "flex-shrink-0 w-8 h-8 md:w-10 md:h-10 rounded-full border flex items-center justify-center transition-transform duration-300",
                     openIndex === index ? "rotate-180 bg-primary/10 border-primary/20 text-primary" : "text-muted-foreground"
                   )}>
-                    <ChevronDown className="h-5 w-5" />
+                    <ChevronDown className="h-4 w-4 md:h-5 md:w-5" />
                   </div>
                 </button>
 
@@ -83,7 +83,7 @@ export default function FAQSection() {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                      <div className="px-6 pb-6 text-muted-foreground leading-relaxed">
+                      <div className="px-5 pb-5 md:px-6 md:pb-6 text-sm md:text-base text-muted-foreground leading-relaxed">
                         {faq.answer}
                       </div>
                     </motion.div>
@@ -93,8 +93,8 @@ export default function FAQSection() {
             ))}
           </div>
 
-          <div className="text-center mt-12">
-            <p className="text-muted-foreground">
+          <div className="text-center mt-12 px-4">
+            <p className="text-sm md:text-base text-muted-foreground">
               Still have questions? Feel free to <span className="text-primary font-bold cursor-pointer hover:underline">contact our support team</span>.
             </p>
           </div>

@@ -155,19 +155,19 @@ export default function SettingsClient() {
     <div className="max-w-2xl space-y-8">
       {/* Profile Section */}
       <Card className="rounded-3xl border-border/50 overflow-hidden shadow-sm">
-        <CardHeader className="bg-muted/30 pb-16 relative border-b border-border/50">
-          <CardTitle className="text-2xl">Profile Information</CardTitle>
-          <CardDescription>
+        <CardHeader className="bg-muted/30 pb-12 sm:pb-16 relative border-b border-border/50">
+          <CardTitle className="text-xl sm:text-2xl text-center sm:text-left">Profile Information</CardTitle>
+          <CardDescription className="text-center sm:text-left">
             Customize your identity on Planora.
           </CardDescription>
 
           {/* Avatar & Upload */}
-          <div className="absolute -bottom-10 left-8">
+          <div className="absolute left-1/2 sm:left-8 -bottom-10 -translate-x-1/2 sm:translate-x-0">
             <div className="relative group">
-              <Avatar className="w-24 h-24 border-4 border-background shadow-xl ring-2 ring-primary/10">
+              <Avatar className="w-20 h-20 sm:w-24 sm:h-24 border-4 border-background shadow-xl ring-2 ring-primary/10">
                 {/* Use undefined instead of empty string to avoid React warning */}
                 <AvatarImage src={previewUrl || undefined} alt={user?.name || ""} />
-                <AvatarFallback className="text-2xl bg-primary/5 text-primary font-bold">
+                <AvatarFallback className="text-xl sm:text-2xl bg-primary/5 text-primary font-bold">
                   {initials}
                 </AvatarFallback>
               </Avatar>
@@ -176,12 +176,12 @@ export default function SettingsClient() {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
+                className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-100 sm:opacity-0 group-hover:opacity-100 transition-all duration-200 cursor-pointer disabled:cursor-not-allowed"
               >
                 {isUploading ? (
-                  <Loader2 className="w-6 h-6 text-white animate-spin" />
+                  <Loader2 className="w-5 h-5 sm:w-6 sm:h-6 text-white animate-spin" />
                 ) : (
-                  <Camera className="w-6 h-6 text-white" />
+                  <Camera className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                 )}
               </button>
 

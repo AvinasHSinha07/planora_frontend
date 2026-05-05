@@ -11,7 +11,7 @@ const stats = [
 
 export default function StatisticsSection() {
   return (
-    <section className="py-20 bg-primary text-primary-foreground relative overflow-hidden">
+    <section className="py-12 md:py-20 bg-primary text-primary-foreground relative overflow-hidden">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 opacity-10">
         <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
@@ -25,7 +25,7 @@ export default function StatisticsSection() {
       </div>
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12 text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-12 text-center">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
@@ -33,10 +33,10 @@ export default function StatisticsSection() {
               whileInView={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               viewport={{ once: true }}
-              className="space-y-2"
+              className="space-y-1 md:space-y-2"
             >
-              <h3 className="text-5xl md:text-6xl font-black tracking-tighter">{stat.value}</h3>
-              <p className="text-lg md:text-xl font-medium opacity-80">{stat.label}</p>
+              <h3 className="text-3xl sm:text-4xl md:text-6xl font-black tracking-tighter">{stat.value}</h3>
+              <p className="text-sm sm:text-base md:text-xl font-medium opacity-80 uppercase tracking-wide">{stat.label}</p>
             </motion.div>
           ))}
         </div>

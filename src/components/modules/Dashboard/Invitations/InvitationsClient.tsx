@@ -120,28 +120,28 @@ export default function InvitationsClient() {
             </div>
           </CardContent>
 
-          <CardFooter className="p-6 pt-0 gap-3">
+          <CardFooter className="p-4 sm:p-6 pt-0 flex flex-col sm:flex-row gap-3">
             {invitation.status === "PENDING" ? (
               <>
                 <Button 
-                  className="flex-1 rounded-2xl gap-2" 
-                  onClick={() => handleStatusUpdate(invitation, "APPROVED")}
-                  disabled={statusMutation.isPending}
+                   className="w-full sm:flex-1 rounded-xl sm:rounded-2xl gap-2 h-11 sm:h-12" 
+                   onClick={() => handleStatusUpdate(invitation, "APPROVED")}
+                   disabled={statusMutation.isPending}
                 >
                   {statusMutation.isPending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />} 
                   {invitation.event.fee > 0 ? "Pay & Accept" : "Accept"}
                 </Button>
                 <Button 
-                  variant="outline" 
-                  className="flex-1 rounded-2xl gap-2 border-destructive/20 text-destructive hover:bg-destructive/5"
-                  onClick={() => handleStatusUpdate(invitation, "REJECTED")}
-                  disabled={statusMutation.isPending}
+                   variant="outline" 
+                   className="w-full sm:flex-1 rounded-xl sm:rounded-2xl gap-2 border-destructive/20 text-destructive hover:bg-destructive/5 h-11 sm:h-12"
+                   onClick={() => handleStatusUpdate(invitation, "REJECTED")}
+                   disabled={statusMutation.isPending}
                 >
                   <X className="w-4 h-4" /> Decline
                 </Button>
               </>
             ) : (
-              <Button variant="ghost" className="w-full rounded-2xl" disabled>
+              <Button variant="ghost" className="w-full rounded-xl sm:rounded-2xl h-11 sm:h-12" disabled>
                 Invitation {invitation.status.toLowerCase()}
               </Button>
             )}

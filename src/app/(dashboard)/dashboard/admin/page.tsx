@@ -16,32 +16,36 @@ import { Separator } from "@/components/ui/separator";
 
 export default function AdminPage() {
   return (
-    <div className="max-w-6xl mx-auto space-y-8 py-6">
+    <div className="max-w-6xl mx-auto space-y-6 sm:space-y-10 py-6 px-4 sm:px-6 lg:px-8">
       {/* Page Header */}
-      <div className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight">Admin Console</h1>
-        <p className="text-muted-foreground">
+      <div className="space-y-2 text-center sm:text-left">
+        <h1 className="text-3xl sm:text-4xl font-black tracking-tight uppercase italic leading-none">
+           Admin <span className="text-primary underline decoration-primary/20 underline-offset-8">Console</span>
+        </h1>
+        <p className="text-muted-foreground text-sm sm:text-base italic">
           Platform-wide oversight and moderation controls.
         </p>
       </div>
 
-      <Separator />
+      <Separator className="bg-border/50" />
 
-      <Tabs defaultValue="overview" className="space-y-6">
-        <TabsList className="w-full justify-start h-12 bg-muted/50 p-1 border rounded-lg">
-          <TabsTrigger value="overview" className="flex items-center gap-2 px-6 h-full font-medium transition-all">
-            <LayoutDashboard className="w-4 h-4" /> Overview
-          </TabsTrigger>
-          <TabsTrigger value="users" className="flex items-center gap-2 px-6 h-full font-medium transition-all">
-            <Users className="w-4 h-4" /> Users
-          </TabsTrigger>
-          <TabsTrigger value="events" className="flex items-center gap-2 px-6 h-full font-medium transition-all">
-            <Calendar className="w-4 h-4" /> Events
-          </TabsTrigger>
-          <TabsTrigger value="payments" className="flex items-center gap-2 px-6 h-full font-medium transition-all">
-            <DollarSign className="w-4 h-4" /> Payments
-          </TabsTrigger>
-        </TabsList>
+      <Tabs defaultValue="overview" className="space-y-6 sm:space-y-10">
+        <div className="w-full overflow-x-auto pb-2 scrollbar-hide">
+          <TabsList className="inline-flex min-w-full sm:min-w-0 h-12 sm:h-14 bg-muted/30 p-1.5 border border-border/40 rounded-2xl backdrop-blur-md">
+            <TabsTrigger value="overview" className="flex items-center gap-2 px-4 sm:px-8 h-full font-black uppercase italic tracking-widest text-[10px] rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <LayoutDashboard className="w-4 h-4" /> Overview
+            </TabsTrigger>
+            <TabsTrigger value="users" className="flex items-center gap-2 px-4 sm:px-8 h-full font-black uppercase italic tracking-widest text-[10px] rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <Users className="w-4 h-4" /> Users
+            </TabsTrigger>
+            <TabsTrigger value="events" className="flex items-center gap-2 px-4 sm:px-8 h-full font-black uppercase italic tracking-widest text-[10px] rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <Calendar className="w-4 h-4" /> Events
+            </TabsTrigger>
+            <TabsTrigger value="payments" className="flex items-center gap-2 px-4 sm:px-8 h-full font-black uppercase italic tracking-widest text-[10px] rounded-xl data-[state=active]:bg-primary data-[state=active]:text-primary-foreground transition-all">
+              <DollarSign className="w-4 h-4" /> Payments
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         <div className="min-h-[400px]">
           <TabsContent value="overview" className="mt-0 focus-visible:outline-none">

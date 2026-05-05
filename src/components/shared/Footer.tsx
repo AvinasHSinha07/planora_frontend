@@ -37,18 +37,18 @@ export default function Footer() {
       <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-brand-yellow/5 rounded-full blur-3xl -z-10" />
 
       <div className="max-w-7xl mx-auto px-4 pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand Section */}
-          <div className="lg:col-span-2 space-y-6">
-            <Link href="/" className="text-2xl font-black tracking-tighter flex items-center gap-2">
+          <div className="sm:col-span-2 lg:col-span-2 space-y-6">
+            <Link href="/" className="text-2xl font-black tracking-tighter flex items-center gap-2 justify-center sm:justify-start">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-brand-pink to-brand-yellow" />
               <span>PLANORA</span>
             </Link>
-            <p className="text-muted-foreground max-w-sm leading-relaxed text-sm">
+            <p className="text-muted-foreground max-w-sm leading-relaxed text-sm text-center sm:text-left mx-auto sm:mx-0">
               Empowering creators and organizers to build stunning, memorable experiences. 
               The premium choice for professional event management.
             </p>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 justify-center sm:justify-start">
               {[FaFacebook, FaTwitter, FaInstagram, FaLinkedin].map((Icon, i) => (
                 <Link 
                   key={i} 
@@ -62,7 +62,7 @@ export default function Footer() {
           </div>
 
           {/* Links Sections */}
-          <div className="space-y-6">
+          <div className="space-y-6 text-center sm:text-left">
             <h4 className="font-bold uppercase tracking-widest text-[10px] text-muted-foreground/80">Platform</h4>
             <ul className="space-y-4">
               {footerLinks.platform.map((link) => (
@@ -75,7 +75,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className="space-y-6">
+          <div className="space-y-6 text-center sm:text-left">
             <h4 className="font-bold uppercase tracking-widest text-[10px] text-muted-foreground/80">Company</h4>
             <ul className="space-y-4">
               {footerLinks.company.map((link) => (
@@ -89,9 +89,9 @@ export default function Footer() {
           </div>
 
           {/* Newsletter Section */}
-          <div className="lg:col-span-1 space-y-6">
+          <div className="sm:col-span-2 lg:col-span-1 space-y-6 text-center sm:text-left">
             <h4 className="font-bold uppercase tracking-widest text-[10px] text-muted-foreground/80">Stay Updated</h4>
-            <div className="space-y-4">
+            <div className="space-y-4 max-w-sm mx-auto sm:mx-0">
               <p className="text-xs text-muted-foreground leading-relaxed">Subscribe for event tips and curated event news.</p>
               <div className="relative group">
                 <Input 
@@ -110,11 +110,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-xs text-muted-foreground font-medium">
+        <div className="pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-6 text-center md:text-left">
+          <p className="text-xs text-muted-foreground font-medium order-2 md:order-1">
             © {currentYear} Planora Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-8">
+          <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-8 order-1 md:order-2">
             <Link href="/privacy" className="text-xs text-muted-foreground hover:text-primary transition-colors font-medium">
               Privacy Policy
             </Link>

@@ -40,48 +40,51 @@ export default function ReviewsClient() {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       {reviews.map((review: any) => (
-        <Card key={review.id} className="rounded-3xl border-border/50 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-          <CardHeader className="bg-muted/30 pb-4">
-            <div className="flex justify-between items-start">
-               <div className="flex items-center gap-3">
-                  <Avatar className="w-10 h-10 border-2 border-background shadow-sm">
+        <Card key={review.id} className="rounded-[2rem] border-border/40 overflow-hidden hover:shadow-2xl transition-all duration-500 group">
+          <CardHeader className="bg-muted/30 pb-5 px-6 sm:px-8 pt-6 sm:pt-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+               <div className="flex items-center gap-4">
+                  <Avatar className="w-12 h-12 border-2 border-background shadow-xl">
                      <AvatarImage src={review.user?.image || review.user?.avatar} />
-                     <AvatarFallback>{review.user?.name?.charAt(0)}</AvatarFallback>
+                     <AvatarFallback className="bg-primary/10 text-primary font-black">{review.user?.name?.charAt(0)}</AvatarFallback>
                   </Avatar>
-                  <div>
-                     <CardTitle className="text-base font-bold">{review.user?.name}</CardTitle>
-                     <CardDescription className="text-xs">
-                        {format(new Date(review.createdAt), "MMM d, yyyy")}
+                  <div className="space-y-0.5">
+                     <CardTitle className="text-lg font-black tracking-tight uppercase italic">{review.user?.name}</CardTitle>
+                     <CardDescription className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                        {format(new Date(review.createdAt), "MMMM d, yyyy")}
                      </CardDescription>
                   </div>
                </div>
-               <div className="flex gap-0.5">
+               <div className="flex gap-1 bg-background/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-border/50 w-fit">
                   {[...Array(5)].map((_, i) => (
                     <Star 
                       key={i} 
-                      className={`w-3.5 h-3.5 ${i < review.rating ? "fill-amber-500 text-amber-500" : "text-muted/30"}`} 
+                      className={`w-3.5 h-3.5 ${i < review.rating ? "fill-amber-500 text-amber-500" : "text-muted/20"}`} 
                     />
                   ))}
                </div>
             </div>
           </CardHeader>
-          <CardContent className="pt-6 space-y-4">
-             <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10">
-                <p className="text-sm font-medium text-primary mb-1 flex items-center gap-2">
+          <CardContent className="p-6 sm:p-8 space-y-6">
+             <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 relative group-hover:bg-primary/10 transition-colors duration-500">
+                <p className="text-[10px] font-black text-primary mb-1 flex items-center gap-2 uppercase tracking-[0.2em]">
                    <Calendar className="w-3 h-3" />
-                   Review for:
+                   Review Payload:
                 </p>
                 <Link 
                   href={`/events/${review.event?.id}`}
-                  className="font-bold hover:underline decoration-primary/30"
+                  className="text-base font-black italic hover:text-primary transition-colors line-clamp-1"
                 >
                   {review.event?.title}
                 </Link>
              </div>
              
-             <p className="text-muted-foreground leading-relaxed italic">
-                "{review.comment}"
-             </p>
+             <div className="relative">
+                <MessageSquare className="absolute -left-2 -top-2 w-10 h-10 text-primary/5 -rotate-12" />
+                <p className="text-muted-foreground leading-relaxed italic text-sm sm:text-base relative z-10 pl-2">
+                   "{review.comment}"
+                </p>
+             </div>
           </CardContent>
         </Card>
       ))}

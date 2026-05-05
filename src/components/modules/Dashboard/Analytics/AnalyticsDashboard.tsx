@@ -87,34 +87,34 @@ export default function AnalyticsDashboard() {
   ];
 
   return (
-    <div className="space-y-12 pb-24 max-w-7xl mx-auto">
+    <div className="space-y-10 sm:space-y-12 pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       {/* Header Section */}
       <motion.div 
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
-        className="flex flex-col md:flex-row md:items-end justify-between gap-6"
+        className="flex flex-col xl:flex-row xl:items-end justify-between gap-8"
       >
-        <div className="space-y-2">
-           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20">
+        <div className="space-y-4 text-center xl:text-left">
+           <div className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest border border-primary/20 mx-auto xl:mx-0">
               <Activity className="w-3 h-3" /> Real-time Ecosystem Pulse
            </div>
-           <h2 className="text-6xl font-black tracking-tighter uppercase italic leading-none">
-              Platform <span className="text-primary underline decoration-primary/20 underline-offset-[12px]">Intelligence</span>
+           <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tighter uppercase italic leading-[0.9]">
+              Platform <span className="text-primary underline decoration-primary/20 underline-offset-[8px] sm:underline-offset-[12px]">Intelligence</span>
            </h2>
-           <p className="text-muted-foreground text-xl italic max-w-2xl">
+           <p className="text-muted-foreground text-sm sm:text-base md:text-xl italic max-w-2xl mx-auto xl:mx-0">
               Analyzing high-frequency data streams across your administrative perimeter.
            </p>
         </div>
-        <div className="flex items-center gap-4 bg-muted/30 px-6 py-3 rounded-2xl border border-border/40 backdrop-blur-md">
+        <div className="flex items-center gap-4 bg-muted/30 px-6 py-4 rounded-2xl border border-border/40 backdrop-blur-md self-center xl:self-auto">
            <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse shadow-lg shadow-emerald-500/50" />
-           <span className="text-sm font-black uppercase tracking-widest italic opacity-70">Live Data Sync: Active</span>
+           <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest italic opacity-70">Live Data Sync: Active</span>
         </div>
       </motion.div>
 
       {/* Intelligence Grid */}
 
       {/* Intelligence Grid */}
-      <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
         {displayStats.map((stat, i) => (
           <motion.div
             key={i}
@@ -123,19 +123,19 @@ export default function AnalyticsDashboard() {
             transition={{ delay: i * 0.1 }}
             viewport={{ once: true }}
           >
-            <Card className="border-none shadow-2xl rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-xl group hover:scale-[1.02] transition-all duration-500">
-              <CardContent className="p-10 relative">
-                <stat.icon className={`absolute -right-4 -bottom-4 w-32 h-32 ${stat.color} opacity-5 group-hover:scale-125 transition-transform duration-1000`} />
+            <Card className="border-none shadow-2xl rounded-[1.5rem] sm:rounded-[2.5rem] overflow-hidden bg-card/40 backdrop-blur-xl group hover:scale-[1.02] transition-all duration-500">
+              <CardContent className="p-6 sm:p-10 relative">
+                <stat.icon className={`absolute -right-4 -bottom-4 w-24 h-24 sm:w-32 sm:h-32 ${stat.color} opacity-5 group-hover:scale-125 transition-transform duration-1000`} />
                 <div className="space-y-4 relative z-10">
-                   <div className={`inline-flex p-4 rounded-[1.5rem] ${stat.bg} ${stat.color} shadow-lg shadow-black/5`}>
-                      <stat.icon className="h-6 w-6" />
+                   <div className={`inline-flex p-3 sm:p-4 rounded-xl sm:rounded-[1.5rem] ${stat.bg} ${stat.color} shadow-lg shadow-black/5`}>
+                      <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                    </div>
                    <div className="space-y-1">
-                      <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.title}</p>
-                      <div className="text-5xl font-black tracking-tighter italic">
+                      <p className="text-[9px] sm:text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.title}</p>
+                      <div className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tighter italic leading-none">
                         {stat.value}
                       </div>
-                      <p className="text-[10px] font-bold text-muted-foreground/50 italic">{stat.description}</p>
+                      <p className="text-[9px] sm:text-[10px] font-bold text-muted-foreground/50 italic">{stat.description}</p>
                    </div>
                 </div>
               </CardContent>

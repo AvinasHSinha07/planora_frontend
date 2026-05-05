@@ -215,39 +215,66 @@ export default function EventsPageClient() {
 
       {/* Pagination */}
       {!isLoading && !error && meta.totalPages > 1 && (
-        <div className="mt-16 flex items-center justify-center gap-4">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full h-12 w-12"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
-            disabled={page === 1}
-          >
-            <ChevronLeft className="h-5 w-5" />
-          </Button>
-          
+        <div className="mt-16 flex flex-col sm:flex-row items-center justify-center gap-6">
           <div className="flex items-center gap-2">
-            {[...Array(meta.totalPages)].map((_, i) => (
-              <Button
-                key={i + 1}
-                variant={page === i + 1 ? "default" : "outline"}
-                className={`w-12 h-12 rounded-full font-bold ${page === i + 1 ? "shadow-lg shadow-primary/20" : ""}`}
-                onClick={() => setPage(i + 1)}
-              >
-                {i + 1}
-              </Button>
-            ))}
-          </div>
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full h-10 w-10 sm:h-12 sm:w-12 border-primary/10 hover:bg-primary/5"
+              onClick={() => {
+                setPage(p => Math.max(1, p - 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={page === 1}
+            >
+              <ChevronLeft className="h-5 w-5" />
+            </Button>
+            
+            <div className="flex items-center gap-1 sm:gap-2">
+              {Array.from({ length: meta.totalPages }, (_, i) => i + 1)
+                .filter(p => {
+                  // Show first, last, and pages around current
+                  if (meta.totalPages <= 5) return true;
+                  return p === 1 || p === meta.totalPages || Math.abs(p - page) <= 1;
+                })
+                .map((p, i, arr) => (
+                  <div key={p} className="flex items-center gap-1 sm:gap-2">
+                    {i > 0 && arr[i-1] !== p - 1 && (
+                      <span className="text-muted-foreground px-1">...</span>
+                    )}
+                    <Button
+                      variant={page === p ? "default" : "outline"}
+                      className={`w-10 h-10 sm:w-12 sm:h-12 rounded-full font-bold text-sm sm:text-base transition-all ${
+                        page === p ? "shadow-lg shadow-primary/20 scale-110" : "border-primary/5 hover:bg-primary/5"
+                      }`}
+                      onClick={() => {
+                        setPage(p);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      }}
+                    >
+                      {p}
+                    </Button>
+                  </div>
+                ))}
+            </div>
 
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-full h-12 w-12"
-            onClick={() => setPage(p => Math.min(meta.totalPages, p + 1))}
-            disabled={page === meta.totalPages}
-          >
-            <ChevronRight className="h-5 w-5" />
-          </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full h-10 w-10 sm:h-12 sm:w-12 border-primary/10 hover:bg-primary/5"
+              onClick={() => {
+                setPage(p => Math.min(meta.totalPages, p + 1));
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              disabled={page === meta.totalPages}
+            >
+              <ChevronRight className="h-5 w-5" />
+            </Button>
+          </div>
+          
+          <p className="text-xs sm:text-sm font-bold text-muted-foreground uppercase tracking-widest">
+            Page {page} of {meta.totalPages}
+          </p>
         </div>
       )}
     </div>

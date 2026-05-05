@@ -95,23 +95,23 @@ export default function AdminOverview() {
       <motion.div 
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col md:flex-row md:items-center justify-between gap-6"
+        className="flex flex-col xl:flex-row xl:items-center justify-between gap-8"
       >
-        <div className="space-y-1">
-          <h2 className="text-4xl font-black tracking-tight uppercase italic flex items-center gap-3">
-             <ShieldCheck className="w-10 h-10 text-primary" />
-             Admin <span className="text-primary underline decoration-4 underline-offset-8">Command Center</span>
+        <div className="space-y-3 text-center xl:text-left">
+          <h2 className="text-3xl sm:text-5xl font-black tracking-tighter uppercase italic leading-[0.9] flex flex-col sm:flex-row items-center gap-3 sm:gap-4">
+             <ShieldCheck className="w-10 h-10 sm:w-12 sm:h-12 text-primary" />
+             Admin <span className="text-primary underline decoration-4 underline-offset-8 sm:underline-offset-12">Command Center</span>
           </h2>
-          <p className="text-muted-foreground text-lg italic">Strategic oversight and platform-wide moderation.</p>
+          <p className="text-muted-foreground text-sm sm:text-lg italic">Strategic oversight and platform-wide moderation.</p>
         </div>
-        <div className="flex items-center gap-3 bg-card/50 backdrop-blur-md px-6 py-3 rounded-2xl border border-primary/20 shadow-lg shadow-primary/5">
+        <div className="flex items-center gap-3 bg-card/50 backdrop-blur-md px-6 py-4 rounded-2xl border border-primary/20 shadow-lg shadow-primary/5 self-center xl:self-auto">
            <div className="h-3 w-3 rounded-full bg-emerald-500 animate-pulse" />
-           <span className="text-sm font-bold uppercase tracking-widest italic">System Live: 99.9% Uptime</span>
+           <span className="text-[10px] sm:text-xs font-black uppercase tracking-widest italic">System Live: 99.9% Uptime</span>
         </div>
       </motion.div>
 
       {/* Stats Grid */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
         {statCards.map((stat, i) => (
           <motion.div
             key={i}
@@ -119,20 +119,20 @@ export default function AdminOverview() {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: i * 0.1 }}
           >
-            <Card className="rounded-[2.5rem] border-none shadow-xl bg-card/40 backdrop-blur-xl group hover:bg-card transition-all duration-500 overflow-hidden relative">
-              <CardContent className="p-8">
+            <Card className="rounded-[1.5rem] sm:rounded-[2.5rem] border-none shadow-xl bg-card/40 backdrop-blur-xl group hover:bg-card transition-all duration-500 overflow-hidden relative">
+              <CardContent className="p-6 sm:p-8">
                 <div className="flex justify-between items-start mb-6">
-                   <div className={`p-4 rounded-2xl ${stat.bg} ${stat.color} transition-transform duration-500 group-hover:scale-110`}>
-                      <stat.icon className="h-6 w-6" />
+                   <div className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl ${stat.bg} ${stat.color} transition-transform duration-500 group-hover:scale-110`}>
+                      <stat.icon className="h-5 w-5 sm:h-6 sm:w-6" />
                    </div>
-                   <div className={`flex items-center gap-1 text-xs font-black uppercase tracking-tighter ${stat.isUp ? "text-emerald-500" : "text-destructive"}`}>
+                   <div className={`flex items-center gap-1 text-[10px] font-black uppercase tracking-tighter ${stat.isUp ? "text-emerald-500" : "text-destructive"}`}>
                       {stat.isUp ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
                       {stat.trend}
                    </div>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-xs font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.title}</p>
-                  <div className="text-4xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">{stat.title}</p>
+                  <div className="text-3xl sm:text-4xl font-black tracking-tighter text-foreground group-hover:text-primary transition-colors leading-none">
                     {stat.value}
                   </div>
                 </div>
@@ -143,31 +143,31 @@ export default function AdminOverview() {
         ))}
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-3">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-10">
          {/* Growth Chart */}
-         <Card className="lg:col-span-2 rounded-[3rem] border-none shadow-2xl bg-card/30 backdrop-blur-md overflow-hidden group">
-            <CardHeader className="p-10 pb-0">
-               <div className="flex items-center justify-between">
-                  <div>
-                    <CardTitle className="text-2xl font-black uppercase italic tracking-tight flex items-center gap-2">
-                       <TrendingUp className="w-6 h-6 text-primary" />
+         <Card className="lg:col-span-2 rounded-[2rem] sm:rounded-[3.5rem] border-none shadow-2xl bg-card/30 backdrop-blur-md overflow-hidden group">
+            <CardHeader className="p-6 sm:p-10 pb-0">
+               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="space-y-1">
+                    <CardTitle className="text-xl sm:text-2xl font-black uppercase italic tracking-tight flex items-center gap-2">
+                       <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                        Ecosystem Growth
                     </CardTitle>
-                    <CardDescription className="italic text-base">Analyzing weekly user and event trajectory</CardDescription>
+                    <CardDescription className="italic text-xs sm:text-base">Analyzing weekly user and event trajectory</CardDescription>
                   </div>
                   <div className="flex gap-2">
-                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase">
-                        <div className="w-2 h-2 rounded-full bg-primary" />
+                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
+                        <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                         Users
                      </div>
-                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[10px] font-black uppercase">
-                        <div className="w-2 h-2 rounded-full bg-emerald-500" />
+                     <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-500 text-[9px] sm:text-[10px] font-black uppercase tracking-widest">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                         Events
                      </div>
                   </div>
                </div>
             </CardHeader>
-            <CardContent className="p-10 h-[400px]">
+            <CardContent className="p-4 sm:p-10 h-[300px] sm:h-[450px]">
                <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={growthData}>
                      <defs>
@@ -185,11 +185,11 @@ export default function AdminOverview() {
                         dataKey="name" 
                         axisLine={false} 
                         tickLine={false} 
-                        tick={{fontSize: 12, fontWeight: 700, fill: '#666'}} 
+                        tick={{fontSize: 10, fontWeight: 900, fill: '#666'}} 
                      />
                      <YAxis hide />
                      <Tooltip 
-                        contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', padding: '15px 25px' }}
+                        contentStyle={{ borderRadius: '24px', border: 'none', boxShadow: '0 20px 40px rgba(0,0,0,0.1)', padding: '15px 25px', fontWeight: 'bold' }}
                      />
                      <Area 
                         type="monotone" 
@@ -214,46 +214,46 @@ export default function AdminOverview() {
 
          {/* Right Sidebar Info */}
          <div className="space-y-6">
-            <Card className="rounded-[3rem] border-none shadow-2xl bg-primary text-primary-foreground relative overflow-hidden group p-10">
-               <Globe className="absolute -right-8 -bottom-8 w-48 h-48 opacity-10 group-hover:scale-125 transition-transform duration-700" />
+            <Card className="rounded-[2rem] sm:rounded-[3.5rem] border-none shadow-2xl bg-primary text-primary-foreground relative overflow-hidden group p-8 sm:p-10">
+               <Globe className="absolute -right-8 -bottom-8 w-40 h-40 sm:w-48 sm:h-48 opacity-10 group-hover:scale-125 transition-transform duration-700" />
                <div className="space-y-6 relative z-10">
                   <div className="space-y-2">
-                     <p className="text-xs font-black uppercase tracking-[0.2em] opacity-70">Global Reach</p>
-                     <h3 className="text-4xl font-black tracking-tight leading-none uppercase italic">Expanding <br />the network</h3>
+                     <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-70">Global Reach</p>
+                     <h3 className="text-3xl sm:text-4xl font-black tracking-tight leading-[0.9] uppercase italic">Expanding <br />the network</h3>
                   </div>
-                  <p className="text-sm font-bold opacity-80 leading-relaxed italic">
+                  <p className="text-[11px] sm:text-sm font-bold opacity-80 leading-relaxed italic">
                      Planora is now active in 12 major cities worldwide. Average event diversity has increased by 34% this quarter.
                   </p>
                   <div className="pt-4 flex items-center justify-between border-t border-white/20">
                      <div className="text-center">
-                        <p className="text-2xl font-black">12</p>
-                        <p className="text-[10px] font-black uppercase opacity-60">Cities</p>
+                        <p className="text-xl sm:text-2xl font-black">12</p>
+                        <p className="text-[8px] sm:text-[9px] font-black uppercase opacity-60">Cities</p>
                      </div>
                      <div className="text-center">
-                        <p className="text-2xl font-black">84k</p>
-                        <p className="text-[10px] font-black uppercase opacity-60">Reach</p>
+                        <p className="text-xl sm:text-2xl font-black">84k</p>
+                        <p className="text-[8px] sm:text-[9px] font-black uppercase opacity-60">Reach</p>
                      </div>
                      <div className="text-center">
-                        <p className="text-2xl font-black">4.9</p>
-                        <p className="text-[10px] font-black uppercase opacity-60">Rating</p>
+                        <p className="text-xl sm:text-2xl font-black">4.9</p>
+                        <p className="text-[8px] sm:text-[9px] font-black uppercase opacity-60">Rating</p>
                      </div>
                   </div>
                </div>
             </Card>
 
-            <Card className="rounded-[2.5rem] border-border/40 shadow-xl bg-card/50 backdrop-blur-xl overflow-hidden p-8">
-               <p className="text-sm font-black uppercase tracking-widest text-muted-foreground mb-6">Recent Platform Action</p>
+            <Card className="rounded-[1.5rem] sm:rounded-[2.5rem] border-border/40 shadow-xl bg-card/50 backdrop-blur-xl overflow-hidden p-6 sm:p-8">
+               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-6">Recent Platform Action</p>
                <div className="space-y-4">
                   {[1, 2, 3].map((item) => (
-                    <div key={item} className="flex items-center gap-4 group">
-                       <div className="h-10 w-10 rounded-xl bg-muted group-hover:bg-primary/10 transition-colors flex items-center justify-center font-bold text-primary">
+                    <div key={item} className="flex items-center gap-4 group cursor-pointer">
+                       <div className="h-10 w-10 rounded-xl bg-muted group-hover:bg-primary/10 transition-colors flex items-center justify-center font-black text-primary text-xs">
                           {item}
                        </div>
-                       <div className="flex-1">
-                          <p className="text-sm font-black italic">New Organizer Verified</p>
-                          <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">2 minutes ago</p>
+                       <div className="flex-1 min-w-0">
+                          <p className="text-[11px] sm:text-sm font-black italic truncate group-hover:text-primary transition-colors">New Organizer Verified</p>
+                          <p className="text-[9px] text-muted-foreground font-black uppercase tracking-wider">2 minutes ago</p>
                        </div>
-                       <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
+                       <ArrowUpRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-all group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                     </div>
                   ))}
                </div>

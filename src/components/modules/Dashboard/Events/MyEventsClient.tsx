@@ -87,36 +87,42 @@ export default function MyEventsClient() {
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 bg-card/50 p-6 rounded-2xl border border-border/50">
-        <div className="space-y-1">
-          <h2 className="text-3xl font-bold tracking-tight">My Events</h2>
-          <p className="text-muted-foreground">Manage and track your organized event portfolio.</p>
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 bg-card/50 p-6 sm:p-8 rounded-[1.5rem] sm:rounded-[2.5rem] border border-border/50 shadow-sm">
+        <div className="space-y-1 text-center xl:text-left">
+          <h2 className="text-3xl sm:text-4xl font-black tracking-tight uppercase italic leading-none">
+             My <span className="text-primary">Events</span>
+          </h2>
+          <p className="text-xs sm:text-sm text-muted-foreground font-medium italic">Manage and track your organized event portfolio.</p>
         </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="relative w-full sm:w-64">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+          <div className="relative flex-1 sm:min-w-[280px]">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input 
               placeholder="Search your events..." 
-              className="pl-10 rounded-xl"
+              className="pl-12 rounded-2xl h-12 bg-background/50 border-none focus-visible:ring-primary/20"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Select value={category} onValueChange={setCategory}>
-            <SelectTrigger className="w-[180px] rounded-xl">
-              <div className="flex items-center gap-2">
-                <Tag className="h-4 w-4" />
-                <SelectValue placeholder="Category" />
-              </div>
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((cat: any) => (
-                <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <CreateEventDialog />
+          <div className="flex flex-col xs:flex-row items-center gap-3">
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger className="w-full xs:w-[180px] rounded-2xl h-12 bg-background/50 border-none">
+                <div className="flex items-center gap-2">
+                  <Tag className="h-4 w-4 shrink-0 text-primary" />
+                  <SelectValue placeholder="Category" />
+                </div>
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-none shadow-2xl">
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((cat: any) => (
+                  <SelectItem key={cat.id} value={cat.name}>{cat.name}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="w-full xs:w-auto">
+               <CreateEventDialog />
+            </div>
+          </div>
         </div>
       </div>
 
@@ -140,33 +146,34 @@ export default function MyEventsClient() {
       ) : (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {events.map((event: any) => (
-            <Card key={event.id} className="flex flex-col overflow-hidden transition-all hover:shadow-md">
-              <CardHeader className="pb-4">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <CardTitle className="line-clamp-1">{event.title}</CardTitle>
-                    <CardDescription className="flex items-center gap-1">
-                      <Calendar className="h-3.5 w-3.5" />
-                      {format(event.date, "MMM d, yyyy • h:mm a")}
+            <Card key={event.id} className="flex flex-col overflow-hidden transition-all duration-500 hover:shadow-2xl rounded-[2rem] border-border/40 group relative">
+              <CardHeader className="p-5 sm:p-6 pb-4">
+                <div className="flex justify-between items-start gap-4">
+                  <div className="space-y-1 min-w-0">
+                    <CardTitle className="text-xl sm:text-2xl font-black tracking-tight uppercase italic line-clamp-1 group-hover:text-primary transition-colors">
+                       {event.title}
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-1.5 text-[10px] sm:text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                      <Calendar className="h-3.5 w-3.5 text-primary" />
+                      {format(new Date(event.date), "MMM d, yyyy • h:mm a")}
                     </CardDescription>
                   </div>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" className="h-8 w-8 p-0">
-                        <span className="sr-only">Open menu</span>
-                        <MoreHorizontal className="h-4 w-4" />
+                      <Button variant="ghost" className="h-10 w-10 p-0 rounded-full hover:bg-primary/10 hover:text-primary transition-colors shrink-0">
+                        <MoreHorizontal className="h-5 w-5" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                      <DropdownMenuItem asChild>
+                    <DropdownMenuContent align="end" className="rounded-2xl border-none shadow-2xl p-2 min-w-[180px]">
+                      <DropdownMenuLabel className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 px-3 py-2">Management</DropdownMenuLabel>
+                      <DropdownMenuItem asChild className="rounded-xl focus:bg-primary/10 focus:text-primary cursor-pointer font-bold">
                         <Link href={`/events/${event.id}`}>View Details</Link>
                       </DropdownMenuItem>
                       <EditEventDialog event={event} />
                       <ManageParticipantsDialog eventId={event.id} eventTitle={event.title} triggerType="menuitem" />
-                      <DropdownMenuSeparator />
+                      <DropdownMenuSeparator className="my-2 bg-border/50" />
                       <DropdownMenuItem 
-                        className="text-destructive"
+                        className="text-destructive rounded-xl focus:bg-destructive/10 focus:text-destructive cursor-pointer font-bold"
                         onClick={() => handleDelete(event.id)}
                       >
                         Delete Event
@@ -175,17 +182,28 @@ export default function MyEventsClient() {
                   </DropdownMenu>
                 </div>
               </CardHeader>
-              <CardContent className="mt-auto">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-4">
-                  <MapPin className="h-4 w-4 shrink-0" />
-                  <span className="line-clamp-1">{event.venue || "Online"}</span>
-                </div>
-                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                  <div className="flex items-center gap-1.5 text-sm font-medium">
-                    <Users className="h-4 w-4 text-muted-foreground" />
-                    {event.participants?.length || 0}
+              <CardContent className="px-5 sm:px-6 pb-6 mt-auto space-y-4">
+                <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground font-medium">
+                  <div className="h-8 w-8 rounded-lg bg-primary/5 flex items-center justify-center text-primary shrink-0">
+                    <MapPin className="h-4 w-4" />
                   </div>
-                  <Badge variant={(event.eventType || "").includes("FREE") ? "secondary" : "default"}>
+                  <span className="line-clamp-1 italic">{event.venue || "Online Deployment"}</span>
+                </div>
+                
+                <div className="flex items-center justify-between pt-4 border-t border-border/30">
+                  <div className="flex items-center gap-2">
+                    <div className="h-9 w-9 rounded-xl bg-muted flex items-center justify-center text-muted-foreground shrink-0 border border-border/50 group-hover:bg-primary/10 group-hover:text-primary transition-colors duration-500">
+                      <Users className="h-4 w-4" />
+                    </div>
+                    <div className="flex flex-col">
+                       <span className="text-xs font-black tracking-tighter leading-none">{event.participants?.length || 0}</span>
+                       <span className="text-[8px] font-black uppercase tracking-widest text-muted-foreground opacity-60">Attendees</span>
+                    </div>
+                  </div>
+                  <Badge 
+                    variant={(event.eventType || "").includes("FREE") ? "secondary" : "default"}
+                    className="rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-widest italic"
+                  >
                     {(event.eventType || "N/A").replace("_", " ")}
                   </Badge>
                 </div>

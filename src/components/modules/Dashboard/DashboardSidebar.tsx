@@ -57,7 +57,7 @@ export default function DashboardSidebar() {
   });
 
   return (
-    <nav className="flex flex-col space-y-1 bg-card border rounded-xl p-4 shadow-sm h-full">
+    <nav className="flex flex-col space-y-1 bg-card p-2">
       <div className="mb-4 px-2">
         <h2 className="text-lg font-semibold tracking-tight">Dashboard</h2>
         {userRole && (

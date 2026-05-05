@@ -158,6 +158,7 @@ export default function EventsPageClient() {
                   src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"} 
                   alt={event.title}
                   fill
+                  unoptimized={event.bannerImage?.includes("ellaslist.com.au")}
                   className="object-cover group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 to-secondary/20 group-hover:opacity-40 transition-opacity" />
@@ -168,7 +169,7 @@ export default function EventsPageClient() {
               <CardHeader className="space-y-1">
                 <div className="flex items-center gap-2 text-xs font-medium text-primary mb-1">
                   <CalendarIcon className="h-3 w-3" />
-                  {new Date(event.date).toLocaleDateString(undefined, { dateStyle: 'medium' })}
+                  {new Date(event.date).toLocaleDateString('en-US', { dateStyle: 'medium' })}
                 </div>
                 <CardTitle className="text-xl group-hover:text-primary transition-colors">{event.title}</CardTitle>
                 <div className="flex items-center gap-1 text-xs text-muted-foreground">

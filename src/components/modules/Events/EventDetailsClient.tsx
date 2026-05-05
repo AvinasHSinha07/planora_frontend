@@ -150,6 +150,7 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
           fill
           className="object-cover"
           priority
+          unoptimized={event.bannerImage?.includes("ellaslist.com.au")}
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/40 to-background z-10" />
         <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-transparent to-transparent z-10 hidden md:block" />
@@ -435,6 +436,7 @@ export default function EventDetailsClient({ initialData }: { initialData: any }
                           src={related.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2070"} 
                           alt={related.title}
                           fill
+                          unoptimized={related.bannerImage?.includes("ellaslist.com.au")}
                           className="object-cover group-hover:scale-110 transition-transform duration-700"
                         />
                         <div className="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 group-hover:opacity-40 transition-opacity" />

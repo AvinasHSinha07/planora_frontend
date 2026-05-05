@@ -26,6 +26,11 @@ export default function UpcomingEventsSlider({ initialData }: { initialData?: an
   const [events, setEvents] = useState<any[]>(initialData || []);
   const [loading, setLoading] = useState(!initialData);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -60,7 +65,9 @@ export default function UpcomingEventsSlider({ initialData }: { initialData?: an
     }
   }, [loading]);
 
-  if (loading || events.length === 0) return null;
+  const isUnoptimized = (url: string) => url?.includes("ellaslist.com.au");
+
+  if (!mounted || loading || events.length === 0) return null;
 
   return (
     <section ref={containerRef} className="relative py-32 bg-background overflow-hidden">
@@ -79,6 +86,7 @@ export default function UpcomingEventsSlider({ initialData }: { initialData?: an
             alt="bg"
             fill
             priority
+            unoptimized={isUnoptimized(events[activeIndex]?.bannerImage)}
             className="object-cover blur-[100px] scale-110"
           />
         </motion.div>
@@ -146,6 +154,7 @@ export default function UpcomingEventsSlider({ initialData }: { initialData?: an
                       alt={event.title}
                       fill
                       priority={index === 0}
+                      unoptimized={isUnoptimized(event.bannerImage)}
                       className="object-cover transition-transform duration-1000 group-hover:scale-105"
                     />
                     
@@ -179,13 +188,13 @@ export default function UpcomingEventsSlider({ initialData }: { initialData?: an
                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                               <Calendar className="w-4 h-4" />
                             </div>
-                            {new Date(event.date).toLocaleDateString(undefined, { month: 'long', day: 'numeric', year: 'numeric' })}
+                            {new Date(event.date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
                               <Clock className="w-4 h-4" />
                             </div>
-                            {new Date(event.date).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+                            {new Date(event.date).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}
                           </div>
                           <div className="flex items-center gap-2">
                             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">

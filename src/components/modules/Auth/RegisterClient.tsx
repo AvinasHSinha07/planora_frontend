@@ -46,7 +46,7 @@ export default function RegisterClient() {
     try {
       await authClient.signIn.social({
         provider: "google",
-        callbackURL: "/dashboard"
+        callbackURL: `${window.location.origin}/dashboard`
       });
     } catch (error: any) {
       toast.error("Google registration failed");

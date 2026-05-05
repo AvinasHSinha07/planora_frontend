@@ -50,7 +50,10 @@ export default function EventManagement() {
   const debouncedSearch = useDebounce(searchTerm, 500);
   const queryClient = useQueryClient();
 
+  const isUnoptimized = (url: string) => url?.includes("ellaslist.com.au");
+
   const { data, isLoading, isFetching } = useQuery({
+
     queryKey: ["admin-events", debouncedSearch, feeFilter, featuredFilter, page],
     queryFn: async () => {
       // isFeatured=true if FEATURED, false if STANDARD, omitted if ALL
@@ -180,8 +183,10 @@ export default function EventManagement() {
                           src={event.bannerImage || "https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?auto=format&fit=crop&q=80&w=200"} 
                           alt={event.title}
                           fill
+                          unoptimized={isUnoptimized(event.bannerImage)}
                           className="object-cover"
                         />
+
                       </div>
                       <div className="flex flex-col min-w-0 max-w-[250px]">
                         <span className="font-semibold text-sm truncate">{event.title}</span>

@@ -9,7 +9,8 @@ const nextConfig = {
             { protocol: 'https', hostname: 'images.unsplash.com', pathname: '**' },
             { protocol: 'https', hostname: 'plus.unsplash.com', pathname: '**' },
             { protocol: 'https', hostname: 'i.pravatar.cc', pathname: '**' },
-            { protocol: 'https', hostname: 'images.pexels.com', pathname: '**' }
+            { protocol: 'https', hostname: 'images.pexels.com', pathname: '**' },
+            { protocol: 'https', hostname: 'www.ellaslist.com.au', pathname: '**' }
         ],
     },
     async rewrites() {
